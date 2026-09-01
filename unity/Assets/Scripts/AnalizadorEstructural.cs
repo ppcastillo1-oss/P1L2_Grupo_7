@@ -1,4 +1,4 @@
-/*
+﻿/*
 ================================================================
  AnalizadorEstructural.cs
 ================================================================
@@ -71,7 +71,7 @@ public class AnalizadorEstructural : MonoBehaviour
 
     void Start()
     {
-        if (visor == null) visor = FindObjectOfType<VisorEstructura>();
+        if (visor == null) visor = FindAnyObjectByType<VisorEstructura>();
         if (visor == null)
         {
             Debug.LogError("No hay VisorEstructura en la escena. Asignalo en "

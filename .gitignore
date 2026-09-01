@@ -23,8 +23,11 @@ MemoryCaptures/
 Recordings/
 *.csproj
 *.sln
+*.slnx
 *.unityproj
 *.userprefs
+.vscode/
+.idea/
 sysinfo.txt
 *.apk
 *.aab

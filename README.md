@@ -119,8 +119,31 @@ corresponde a ninguna fórmula y subestimaba J unas 5.6 veces.
 
 ## El viewer (Unity)
 
-Escena: agregar `VisorEstructura` **y** `VisorQA` al mismo GameObject.
+**Versión fijada: Unity 6000.5.10f1.** No actualizar durante el proyecto.
+
+Abrir `unity/` con esa versión. La escena se arma sola:
+
+> menú **Laboratorio → Configurar escena**
+
+Eso conecta `Visor` (VisorEstructura + VisorQA) con la `Main Camera`
+(CamaraOrbital) y guarda la escena. Es idempotente: correrlo dos veces
+no duplica nada. También se puede hacer sin abrir el editor:
+
+```bash
+Unity.exe -batchmode -quit -projectPath unity -executeMethod ConfigurarEscena.Configurar
+```
+
 El JSON ya está en `Assets/StreamingAssets/`.
+
+**Controles:** arrastrar con el botón izquierdo orbita · botón derecho
+o central panea · rueda hace zoom · `F` encuadra todo el modelo ·
+**click sin arrastrar** selecciona una barra.
+
+> Nota: `activeInputHandler` está en **Both**. El proyecto trae el
+> paquete Input System, pero los scripts usan la API clásica
+> (`Input.GetMouseButton`); con el modo "solo Input System nuevo" esas
+> llamadas lanzan excepción en runtime y no se podría ni orbitar ni
+> seleccionar.
 
 Capas que se prenden y apagan: nodos, vigas, columnas, muros, **apoyos,
 diafragmas, ejes locales, IDs, áreas tributarias**. Hay filtro por piso

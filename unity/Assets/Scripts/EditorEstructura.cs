@@ -1,4 +1,4 @@
-/*
+﻿/*
 ================================================================
   EditorEstructura.cs
 ================================================================
@@ -85,9 +85,9 @@ public class EditorEstructura : MonoBehaviour
 
     void Start()
     {
-        if (visor == null) visor = FindObjectOfType<VisorEstructura>();
-        if (analizador == null) analizador = FindObjectOfType<AnalizadorEstructural>();
-        if (camara == null) camara = FindObjectOfType<CamaraOrbital>();
+        if (visor == null) visor = FindAnyObjectByType<VisorEstructura>();
+        if (analizador == null) analizador = FindAnyObjectByType<AnalizadorEstructural>();
+        if (camara == null) camara = FindAnyObjectByType<CamaraOrbital>();
         if (visor == null)
             Debug.LogError("EditorEstructura necesita un VisorEstructura en la escena.");
     }

@@ -42,6 +42,13 @@ public class VisorQA : MonoBehaviour
     [Header("Referencias")]
     public VisorEstructura visor;
     public Camera camara;
+    [Tooltip("Se busca sola si no se asigna. Sirve para no seleccionar "
+           + "cuando el click fue en realidad un arrastre de camara.")]
+    public CamaraOrbital orbital;
+
+    // Rectangulo del panel de la UI, en pixeles de pantalla. Se usa para
+    // no dejar que un click sobre la interfaz atraviese al modelo.
+    static readonly Rect RECT_PANEL = new Rect(10, 10, 420, 460);
 
     [Header("Capas QA")]
     public bool verApoyos = true;
@@ -92,6 +99,8 @@ public class VisorQA : MonoBehaviour
     {
         if (visor == null) visor = GetComponent<VisorEstructura>();
         if (camara == null) camara = Camera.main;
+        if (orbital == null && camara != null)
+            orbital = camara.GetComponent<CamaraOrbital>();
     }
 
     void OnValidate()
@@ -117,8 +126,18 @@ public class VisorQA : MonoBehaviour
     // ============================================================
     void LeerClick()
     {
-        if (!Input.GetMouseButtonDown(0)) return;
+        // Se selecciona al SOLTAR, no al presionar, y solo si no hubo
+        // arrastre: el mismo boton izquierdo lo usa CamaraOrbital para
+        // orbitar. Si se seleccionara en GetMouseButtonDown, cada vez
+        // que giras la vista seleccionarias lo que hubiera debajo del
+        // cursor. Es la misma convencion que ya usa EditorEstructura.
+        if (!Input.GetMouseButtonUp(0)) return;
         if (camara == null) return;
+        if (orbital != null && orbital.HuboArrastre) return;
+
+        // Un click sobre el panel de la UI no debe atravesar y
+        // seleccionar la barra que haya detras.
+        if (MouseSobrePanel()) return;
 
         Ray rayo = camara.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
@@ -130,6 +149,15 @@ public class VisorQA : MonoBehaviour
         seleccionado = BuscarElemento(de.idElemento);
         panel = DescribirSeleccion();
         refrescar = true;
+    }
+
+    /// El origen de GUI esta arriba-izquierda y el de Input.mousePosition
+    /// abajo-izquierda: hay que invertir la Y antes de comparar.
+    bool MouseSobrePanel()
+    {
+        Vector2 p = new Vector2(Input.mousePosition.x,
+                                Screen.height - Input.mousePosition.y);
+        return RECT_PANEL.Contains(p);
     }
 
     Elemento BuscarElemento(int id)

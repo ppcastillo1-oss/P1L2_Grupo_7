@@ -1,4 +1,4 @@
-/*
+﻿/*
 ================================================================
   CamaraOrbital.cs
 ================================================================
@@ -133,7 +133,7 @@ public class CamaraOrbital : MonoBehaviour
     /// Centra y aleja la camara para que quepa todo el modelo.
     public void EncuadrarTodo()
     {
-        if (visor == null) visor = FindObjectOfType<VisorEstructura>();
+        if (visor == null) visor = FindAnyObjectByType<VisorEstructura>();
         if (visor == null || visor.Modelo == null || visor.Modelo.nodos == null
             || visor.Modelo.nodos.Count == 0) return;
 
