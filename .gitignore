@@ -4,6 +4,15 @@
 results/
 __pycache__/
 *.pyc
+.ipynb_checkpoints/
+.venv/
+venv/
+
+# ============================================================
+#  App standalone compilada por Unity
+# ============================================================
+# Son ~100 MB y se regeneran con:  python src/lanzar_unity.py build
+build/
 
 # ============================================================
 #  Unity — cache regenerable
@@ -39,6 +48,10 @@ sysinfo.txt
 Thumbs.db
 desktop.ini
 .DS_Store
+
+# Artefactos que genera sola la Test Framework de Unity al compilar
+unity/Assets/Resources/PerformanceTestRunInfo.json*
+unity/Assets/Resources/PerformanceTestRunSettings.json*
 Sin*título*.png
 
 # Snapshot viejo de estos mismos archivos; el repo es la fuente de verdad

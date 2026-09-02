@@ -1,0 +1,21 @@
+# Dependencias del laboratorio estructural.
+#   python -m venv .venv
+#   .venv\Scripts\activate
+#   python -m pip install -r requirements.txt
+
+# --- Analisis estructural ---
+openseespy>=3.8.0      # motor de calculo (OpenSees)
+
+# --- Lectura de planos ---
+ezdxf>=1.4.0           # extraccion de muros y ejes desde los DXF
+
+# --- Notebook ---
+jupyterlab>=4.0        # entorno para laboratorio.ipynb
+ipykernel>=6.0
+matplotlib>=3.8        # graficos de areas tributarias y planta
+numpy>=1.26
+
+# Unity NO se instala con pip: se instala desde Unity Hub.
+# Version exigida por el proyecto: 6000.5.10f1
+# (la declara unity/ProjectSettings/ProjectVersion.txt y la verifica
+#  src/lanzar_unity.py antes de compilar)

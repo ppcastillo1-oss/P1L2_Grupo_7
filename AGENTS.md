@@ -98,6 +98,56 @@ bien.
 Saint-Venant, no `min(Iy,Iz)·0.3` (que no es ninguna fórmula y
 subestimaba J 5.6 veces).
 
+### El input de Unity puede estar "apagado"
+`ProjectSettings.asset` → `activeInputHandler`: `0` = clásico, `1` = solo
+Input System nuevo, `2` = ambos. Los scripts usan la API clásica
+(`Input.GetMouseButton`); con `1` **lanzan excepción en runtime** y no se
+puede ni orbitar ni seleccionar, aunque todo compile sin errores. Debe
+quedar en `2`.
+
+### `-batchmode` y Play son incompatibles
+No se puede "apretar Play" desde fuera de Unity. Para mostrar el modelo
+sin abrir el editor hay que **compilar una app standalone**
+(`ConstruirApp.Construir`); eso sí se automatiza. Lo hace
+`src/lanzar_unity.py`.
+
+### Compilar Unity sin abrir el editor
+```
+Unity.exe -batchmode -quit -nographics -projectPath <dir> -logFile <log>
+```
+Verificar que exista `Library/ScriptAssemblies/Assembly-CSharp.dll`: si no
+está, **no compiló nada** y un log "sin errores" no significa nada. Ojo:
+la primera importación tarda ~10 min y el proceso sigue vivo aunque el
+comando reporte exit 0; lanzar un segundo Unity en paralelo falla con
+código 1 (proyecto bloqueado).
+
+### Los shaders se eliminan al compilar
+El visor no usa materiales de asset: los crea en runtime con
+`new Material(Shader.Find("Universal Render Pipeline/Lit"))`. Pero al
+compilar, Unity **elimina** los shaders que no ve referenciados por
+ningún material de la escena, y entonces `Shader.Find()` devuelve `null`.
+
+Síntoma: **en el editor se ve bien y la app compilada no dibuja nada**,
+con `"No encontre ningun shader utilizable"` + `ArgumentNullException` en
+el `Player.log`. Es un error que **solo existe en la build**.
+
+Solución: los shaders van en *Graphics Settings → Always Included
+Shaders*. Lo hace solo `ConstruirApp.AsegurarShadersIncluidos()`.
+
+> Lección general: compilar sin errores **no** significa que la app
+> funcione. Hay que ejecutarla y leer el `Player.log`
+> (`%USERPROFILE%\AppData\LocalLow\<empresa>\<producto>\Player.log`, o
+> pasarle `-logFile <ruta>` al ejecutable). Y hay que cerrarla **con
+> gracia**: si se mata a la fuerza, el log queda sin vaciar y parece que
+> no pasó nada.
+
+### El JSON tiene que llegar a la build
+El visor lee `StreamingAssets/modelo_unity.json`. Al recalcular el modelo
+hay que copiarlo tanto al proyecto como a
+`build/LaboratorioEstructural_Data/StreamingAssets/`. Lo hace
+`lanzar_unity.sincronizar_json()`. Si se omite, el visor muestra el modelo
+viejo **sin avisar**.
+
 ---
 
 ## Registro de uso de IA

@@ -311,21 +311,57 @@ haya elementos huérfanos. **Pasa.**
 
 ## 5. Reproducibilidad
 
+### 5.1 El laboratorio completo en un notebook
+
+`laboratorio.ipynb` corre toda la cadena de principio a fin:
+
+```
+planos DXF → geometría → áreas tributarias → OpenSees → verificaciones → JSON → Unity
+```
+
 ```bash
-python -m pip install openseespy ezdxf
+python -m pip install -r requirements.txt
+jupyter lab laboratorio.ipynb
+```
+
+Incluye la **visualización del reparto tributario en planta** (matplotlib),
+que permite ver de un vistazo que los paños alargados reparten distinto
+a los cuadrados, y una celda final que **abre el visor 3D desde el propio
+notebook**.
+
+> El modo *Play* del editor de Unity es interactivo y no se puede
+> disparar desde fuera: `-batchmode` y Play son incompatibles. Por eso
+> `src/lanzar_unity.py` compila una **aplicación standalone** —eso sí se
+> automatiza— y luego ejecutarla es un proceso normal. La primera
+> compilación tarda unos minutos; después arranca en segundos y ya no
+> hace falta abrir Unity.
+>
+> El lanzador **exige la versión de Unity que declara el proyecto**
+> (`6000.5.10f1`) y falla con mensaje explícito si no está: abrir el
+> proyecto con otra versión hace que Unity migre los assets, que es una
+> fuente clásica de conflictos en un repo compartido.
+
+### 5.2 Por línea de comandos
+
+```bash
 python src/extraer_muros_dxf.py     # muros desde el plano
 python verificar_lab2.py            # las 5 verificaciones
 python src/exportar_unity.py        # JSON para Unity
+python src/lanzar_unity.py          # abrir el visor
 python tests/test_areas_tributarias.py
 python tests/test_contrato_unity.py
 ```
 
 | Archivo | Rol |
 |---|---|
+| `laboratorio.ipynb` | **el laboratorio completo, celda por celda** |
 | `src/modelo_edificio.py` | fuente de verdad: geometría, secciones, cargas |
 | `src/areas_tributarias.py` | reparto 45°, polígonos, conservación |
 | `src/extraer_muros_dxf.py` | muros desde `RLE-MURO` |
 | `src/exportar_unity.py` | contrato JSON |
+| `src/lanzar_unity.py` | compila y abre el visor desde Python |
+| `unity/Assets/Editor/ConfigurarEscena.cs` | arma la escena (idempotente) |
+| `unity/Assets/Editor/ConstruirApp.cs` | compila la app standalone |
 | `data/muros.json` | 24 muros extraídos |
 | `data/modelo_unity.json` | modelo + resultados + áreas tributarias |
 | `verificar_lab2.py` | las 5 verificaciones |

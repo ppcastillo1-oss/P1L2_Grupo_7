@@ -27,9 +27,23 @@ Las **5 verificaciones del Lab pasan**: `python verificar_lab2.py`
 
 ## Cómo correrlo
 
+### Opción A — el notebook (recomendado)
+
+Todo el laboratorio de principio a fin, celda por celda: geometría →
+áreas tributarias (con gráficos) → OpenSees → verificaciones → JSON →
+**abre el visor 3D desde el propio notebook**.
+
 ```bash
-python -m pip install openseespy ezdxf
+python -m pip install -r requirements.txt
 ```
+
+```bash
+jupyter lab laboratorio.ipynb
+```
+
+Luego `Kernel → Restart & Run All`, o celda por celda para la defensa.
+
+### Opción B — por línea de comandos
 
 ```bash
 python verificar_lab2.py
@@ -38,6 +52,12 @@ python verificar_lab2.py
 Eso construye el modelo, lo resuelve y corre las 5 verificaciones
 (carga de losa, suma de áreas tributarias, conservación, equilibrio,
 compatibilidad del diafragma).
+
+Para abrir el visor sin notebook:
+
+```bash
+python src/lanzar_unity.py
+```
 
 Para regenerar el JSON que consume Unity:
 
