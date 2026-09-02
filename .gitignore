@@ -35,8 +35,10 @@ Recordings/
 *.slnx
 *.unityproj
 *.userprefs
-.vscode/
 .idea/
+# Lo que genera Unity sola dentro del proyecto (no la config del repo,
+# que si se versiona: ver .vscode/settings.json en la raiz)
+unity/.vscode/
 sysinfo.txt
 *.apk
 *.aab

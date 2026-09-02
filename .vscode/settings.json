@@ -1,0 +1,15 @@
+{
+  // Interprete del repo. Con esto VS Code y el notebook toman solo el
+  // .venv que crea setup.ps1, sin que nadie tenga que elegirlo a mano.
+  "python.defaultInterpreterPath": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
+
+  // El notebook usa rutas relativas (data/, src/, unity/): el kernel
+  // tiene que arrancar en la raiz del repo, no en la carpeta del .ipynb.
+  "jupyter.notebookFileRoot": "${workspaceFolder}",
+
+  "python.terminal.activateEnvironment": true,
+  "files.exclude": {
+    "**/__pycache__": true,
+    "**/.ipynb_checkpoints": true
+  }
+}

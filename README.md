@@ -47,11 +47,27 @@ Todo el laboratorio de principio a fin, celda por celda: geometría →
 áreas tributarias (con gráficos) → OpenSees → verificaciones → JSON →
 **abre el visor 3D desde el propio notebook**.
 
+Hay dos formas equivalentes; da lo mismo cuál se use.
+
+**a) VS Code** — todo en una ventana, sin navegador:
+
+```bash
+code .
+```
+
+Abrir `laboratorio.ipynb`, y arriba a la derecha en **Select Kernel**
+elegir el `.venv` del repo (`.venv\Scripts\python.exe`). Requiere la
+extensión *Jupyter* de Microsoft. El archivo `.vscode/settings.json` ya
+deja apuntado el intérprete y la carpeta de trabajo.
+
+**b) Jupyter Lab** — en el navegador:
+
 ```bash
 .\lab.ps1
 ```
 
-Luego `Kernel → Restart & Run All`, o celda por celda para la defensa.
+En ambos casos: `Run All` para correrlo entero, o celda por celda para
+la defensa.
 
 ### 3. O por línea de comandos
 
