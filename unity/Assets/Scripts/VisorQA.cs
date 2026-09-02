@@ -48,7 +48,15 @@ public class VisorQA : MonoBehaviour
 
     // Rectangulo del panel de la UI, en pixeles de pantalla. Se usa para
     // no dejar que un click sobre la interfaz atraviese al modelo.
-    static readonly Rect RECT_PANEL = new Rect(10, 10, 420, 460);
+    // El alto se ajusta a la pantalla: con muchos controles el panel no
+    // cabe en una ventana chica y, sin scroll, los de abajo quedan
+    // inalcanzables.
+    static Rect RectPanel()
+    {
+        return new Rect(10, 10, 430, Mathf.Min(Screen.height - 20, 760));
+    }
+
+    private Vector2 scroll;
 
     [Header("Capas QA")]
     public bool verApoyos = true;
@@ -157,7 +165,7 @@ public class VisorQA : MonoBehaviour
     {
         Vector2 p = new Vector2(Input.mousePosition.x,
                                 Screen.height - Input.mousePosition.y);
-        return RECT_PANEL.Contains(p);
+        return RectPanel().Contains(p);
     }
 
     Elemento BuscarElemento(int id)
@@ -500,8 +508,8 @@ public class VisorQA : MonoBehaviour
         if (visor == null || visor.Modelo == null) return;
 
         GUI.color = Color.white;
-        GUILayout.BeginArea(new Rect(10, 10, 420, 460),
-                            GUI.skin.box);
+        GUILayout.BeginArea(RectPanel(), GUI.skin.box);
+        scroll = GUILayout.BeginScrollView(scroll);
 
         ModeloEstructural m = visor.Modelo;
         GUILayout.Label($"Nodos {m.nodos.Count}   Elementos {m.elementos.Count}");
@@ -524,12 +532,71 @@ public class VisorQA : MonoBehaviour
         if (GUILayout.Button("+")) { soloNivel = Mathf.Min(8, soloNivel + 1); refrescar = true; }
         GUILayout.EndHorizontal();
 
+        // ---------- Capas del modelo ----------
+        GUILayout.Space(6);
+        GUILayout.Label("--- modelo ---");
+        GUILayout.BeginHorizontal();
+        bool nod = GUILayout.Toggle(visor.verNodos, "Nodos");
+        bool col = GUILayout.Toggle(visor.verColumnas, "Columnas");
+        GUILayout.EndHorizontal();
+        GUILayout.BeginHorizontal();
+        bool vig = GUILayout.Toggle(visor.verVigas, "Vigas");
+        bool mur = GUILayout.Toggle(visor.verMuros, "Muros");
+        GUILayout.EndHorizontal();
+
+        bool perf = GUILayout.Toggle(visor.verPerfiles,
+                                     "Perfiles reales (b x h)");
+
+        if (nod != visor.verNodos || col != visor.verColumnas ||
+            vig != visor.verVigas || mur != visor.verMuros ||
+            perf != visor.verPerfiles)
+        {
+            visor.verNodos = nod; visor.verColumnas = col;
+            visor.verVigas = vig; visor.verMuros = mur;
+            visor.verPerfiles = perf;
+            visor.Redibujar();          // el modelo lo redibuja el Visor
+            refrescar = true;           // y las capas QA, este script
+        }
+
+        // ---------- Deformada ----------
+        GUILayout.Space(6);
+        GUILayout.Label("--- deformada (caso G) ---");
+        bool def = GUILayout.Toggle(visor.mostrarDeformada, "Ver deformada");
+
+        float escala = visor.factorEscala;
+        if (def)
+        {
+            // Los desplazamientos reales son de milimetros sobre un
+            // edificio de decenas de metros: sin amplificar no se ve
+            // NADA. El factor es puramente GRAFICO, no toca el
+            // analisis: la estructura no se deforma mas por subirlo.
+            GUILayout.Label($"escala grafica x{escala:F0}");
+            escala = GUILayout.HorizontalSlider(escala, 1f, 2000f);
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("x1")) escala = 1f;
+            if (GUILayout.Button("x100")) escala = 100f;
+            if (GUILayout.Button("x500")) escala = 500f;
+            if (GUILayout.Button("x1000")) escala = 1000f;
+            GUILayout.EndHorizontal();
+            GUILayout.Label("(la escala es solo visual, no cambia el calculo)");
+        }
+
+        if (def != visor.mostrarDeformada ||
+            !Mathf.Approximately(escala, visor.factorEscala))
+        {
+            visor.mostrarDeformada = def;
+            visor.factorEscala = escala;
+            visor.Redibujar();
+            refrescar = true;
+        }
+
         GUILayout.Space(6);
         if (string.IsNullOrEmpty(panel))
             GUILayout.Label("Click en una barra para inspeccionarla.");
         else
             GUILayout.Label(panel);
 
+        GUILayout.EndScrollView();
         GUILayout.EndArea();
 
         // Los toggles del OnGUI cambian los campos directamente, asi que

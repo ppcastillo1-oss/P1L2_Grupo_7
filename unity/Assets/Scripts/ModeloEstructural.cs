@@ -61,11 +61,19 @@ public class MaterialModelo
 [System.Serializable]
 public class Seccion
 {
-    public string nombre;          // "columna", "viga", "muro"
+    public string nombre;          // "C50x50", "VX30x60", "MURO_M1"...
     public float A;                // area m2
     public float Iy;               // inercia m4
     public float Iz;
     public float J;                // torsion m4
+
+    // Dimensiones REALES en metros, para poder dibujar el perfil.
+    // b = ancho (a lo largo del eje local y)
+    // h = canto (a lo largo del eje local z)
+    public float b;
+    public float h;
+
+    public bool TienePerfil { get { return b > 0.001f && h > 0.001f; } }
 }
 
 [System.Serializable]
@@ -283,7 +291,24 @@ public class ModeloEstructural
     }
 
     /// Hay que llamarlo si se agregan o quitan nodos.
-    public void InvalidarIndice() { _porId = null; }
+    public void InvalidarIndice() { _porId = null; _porSeccion = null; }
+
+    [System.NonSerialized]
+    private Dictionary<string, Seccion> _porSeccion;
+
+    /// Busca una seccion por nombre. null si no existe.
+    public Seccion SeccionPorNombre(string nombre)
+    {
+        if (string.IsNullOrEmpty(nombre)) return null;
+        if (_porSeccion == null)
+        {
+            _porSeccion = new Dictionary<string, Seccion>();
+            if (secciones != null)
+                foreach (Seccion s in secciones) _porSeccion[s.nombre] = s;
+        }
+        Seccion r;
+        return _porSeccion.TryGetValue(nombre, out r) ? r : null;
+    }
 
     public CasoDeCarga CasoPorNombre(string nombre)
     {

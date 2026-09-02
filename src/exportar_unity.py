@@ -146,12 +146,49 @@ def main():
                 largo=m['largo'], espesor=m['espesor'])
 
     # ---------- Secciones ----------
+    # Se exportan tambien b y h (las dimensiones REALES en metros) para
+    # que Unity pueda dibujar el perfil de cada barra en vez de un
+    # cilindro generico. Sin esto no se puede ver que una viga es
+    # 30x80 y otra 30x60, que es justo lo que se revisa a ojo.
+    #
+    # CONVENCION DE Iy/Iz EN EL CONTRATO
+    # Los valores van en EJES DE LA SECCION, no en los huecos que espera
+    # ops.element(). Quien construya el modelo aplica el cruce que
+    # corresponda segun la geometria del elemento:
+    #
+    #   elemento horizontal (vecxz = 0,0,1) -> Iy_slot = sec.Iz  (gravedad)
+    #   elemento vertical   (vecxz = 1,0,0) -> Iy_slot = sec.Iy
+    #
+    # Por eso una VIGA exporta Iz = I_gravedad. Exportarlo ya cruzado
+    # hacia que el servidor de reanalisis lo cruzara UNA SEGUNDA VEZ y
+    # resolviera con la inercia equivocada: daba 12.17 mm donde Python
+    # daba 11.78 mm, sin ningun error visible.
+    # Da igual si es viga o columna: en ambos casos la inercia que
+    # termina resistiendo la gravedad es 'Iz' del contrato. Para la
+    # viga porque el consumidor la cruza; para la columna porque su
+    # Iz ya ocupa el hueco Iz. Coincide con como las arma
+    # modelo_edificio._agregar_barra().
     secciones = []
     for nombre, s in M.SECCIONES.items():
         secciones.append({
             'nombre': nombre, 'A': round(s['A'], 6),
-            'Iy': round(s['I_grav'], 9), 'Iz': round(s['I_lat'], 9),
+            'Iy': round(s['I_lat'], 9),
+            'Iz': round(s['I_grav'], 9),
             'J': round(s['J'], 9),
+            'b': round(s['b'], 4), 'h': round(s['h'], 4),
+        })
+
+    # Cada muro tiene su propia seccion (largo x espesor distintos).
+    for m in topo['muros']:
+        nombre = f"MURO_{m['muro_id']}"
+        if any(x['nombre'] == nombre for x in secciones):
+            continue
+        sm = M.seccion_muro(m['largo'], m['espesor'])
+        secciones.append({
+            'nombre': nombre, 'A': round(sm['A'], 6),
+            'Iy': round(sm['I_fuerte'], 9), 'Iz': round(sm['I_debil'], 9),
+            'J': round(sm['J'], 9),
+            'b': round(m['largo'], 4), 'h': round(m['espesor'], 4),
         })
 
     # ---------- Diafragmas ----------
@@ -198,20 +235,67 @@ def main():
             'n_poligonos': len(reg['poligonos']),
         })
 
-    # ---------- Casos de carga ----------
+    # ---------- Caso de carga G ----------
+    # OJO: tiene que ser el caso COMPLETO, el mismo que resolvio Python.
+    # Si aca solo se exportara la carga de losa, el servidor de
+    # reanalisis resolveria un problema DISTINTO al del informe y nadie
+    # se enteraria: daria numeros parecidos pero mas chicos (sin peso
+    # propio, 10.04 mm en vez de 11.78 mm). Al final se verifica que la
+    # suma exportada calce con la que se aplico de verdad.
     cargas_dist = []
-    for (tag, ni, nj, lev, ix, iy) in topo['vigas_x']:
-        reg = trib[('X', ix, iy)]
-        cargas_dist.append({
-            'elemento': tag, 'wy': 0.0,
-            'wz': round(-at.carga_lineal(M.Q_G, reg['area'], reg['luz']), 6),
-            'wx': 0.0})
-    for (tag, ni, nj, lev, ix, iy) in topo['vigas_y']:
-        reg = trib[('Y', ix, iy)]
-        cargas_dist.append({
-            'elemento': tag, 'wy': 0.0,
-            'wz': round(-at.carga_lineal(M.Q_G, reg['area'], reg['luz']), 6),
-            'wx': 0.0})
+    cargas_nodales = []
+    total_exportado = 0.0
+
+    def viga_con_peso(lista, clave, nombre_sec):
+        """Carga de losa (tributaria) + peso propio de la viga."""
+        nonlocal total_exportado
+        s = M.SECCIONES[nombre_sec]
+        w_propio = M.GAMMA * s['A']
+        for (tag, ni, nj, lev, ix, iy) in lista:
+            reg = trib[(clave, ix, iy)]
+            w = at.carga_lineal(M.Q_G, reg['area'], reg['luz']) + w_propio
+            cargas_dist.append({'elemento': tag, 'wy': 0.0,
+                                'wz': round(-w, 6), 'wx': 0.0})
+            L = math.dist(coords[ni], coords[nj])
+            total_exportado += w * L
+
+    viga_con_peso(topo['vigas_x'], 'X', M.SEC_VIGA_X)
+    viga_con_peso(topo['vigas_y'], 'Y', M.SEC_VIGA_Y)
+
+    # Peso propio de columnas y muros: nodal, mitad en cada extremo.
+    acum = {}
+
+    def nodal(n, fz):
+        acum[n] = acum.get(n, 0.0) + fz
+
+    sc = M.SECCIONES[M.SEC_COLUMNA]
+    for (tag, ni, nj) in topo['columnas']:
+        L = abs(coords[nj][2] - coords[ni][2])
+        W = M.GAMMA * sc['A'] * L
+        nodal(ni, -W / 2.0)
+        nodal(nj, -W / 2.0)
+        total_exportado += W
+
+    for m in topo['muros']:
+        L = abs(coords[m['nj']][2] - coords[m['ni']][2])
+        W = M.GAMMA * m['A'] * L
+        nodal(m['ni'], -W / 2.0)
+        nodal(m['nj'], -W / 2.0)
+        total_exportado += W
+
+    for n, fz in sorted(acum.items()):
+        cargas_nodales.append({'nodo': n, 'fx': 0.0, 'fy': 0.0,
+                               'fz': round(fz, 6),
+                               'mx': 0.0, 'my': 0.0, 'mz': 0.0})
+
+    err_carga = abs(total_exportado - carga_G)
+    print(f"  caso G exportado: {total_exportado:.4f} kN "
+          f"(aplicado {carga_G:.4f}, error {err_carga:.3e})")
+    if err_carga > 1e-6:
+        raise RuntimeError(
+            f"El caso G exportado ({total_exportado:.4f} kN) no coincide con "
+            f"el que se resolvio ({carga_G:.4f} kN). Quien reanalice desde "
+            f"Unity obtendria otros resultados.")
 
     modelo = {
         'info': {
@@ -230,8 +314,10 @@ def main():
         'areas_tributarias': tributarias,
         'casos_de_carga': [{
             'nombre': 'G',
-            'descripcion': 'Peso propio + losa + terminaciones (q_G por areas tributarias)',
-            'cargas_nodales': [],
+            'descripcion': ('Peso propio + losa + terminaciones. Caso COMPLETO: '
+                            'reanalizarlo reproduce el mismo resultado que '
+                            'reporta el informe.'),
+            'cargas_nodales': cargas_nodales,
             'cargas_distribuidas': cargas_dist,
         }],
         'resumen': {

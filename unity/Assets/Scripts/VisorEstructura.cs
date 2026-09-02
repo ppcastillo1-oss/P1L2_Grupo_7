@@ -52,6 +52,12 @@ public class VisorEstructura : MonoBehaviour
     [Tooltip("Amplifica el desplazamiento. Los mm reales no se verian.")]
     public float factorEscala = 300f;
 
+    [Header("Perfiles")]
+    [Tooltip("Dibuja cada barra con su seccion REAL (b x h) en vez de un "
+           + "cilindro generico. Asi se ve que una viga es 30x80 y otra "
+           + "30x60, que es lo que se revisa a ojo contra el plano.")]
+    public bool verPerfiles = false;
+
     [Header("Capas visibles")]
     public bool verNodos = true;
     [Tooltip("Los nodos intermedios de las vigas. Apagalos para ver "
@@ -237,9 +243,22 @@ public class VisorEstructura : MonoBehaviour
                 continue;
             }
 
-            GameObject barra = (e.EsMuro && e.largo > 0.01f)
-                ? CrearPlacaMuro(PosicionDe(a), PosicionDe(b), e)
-                : CrearCilindro(PosicionDe(a), PosicionDe(b), grosorBarra);
+            GameObject barra;
+            if (e.EsMuro && e.largo > 0.01f)
+            {
+                barra = CrearPlacaMuro(PosicionDe(a), PosicionDe(b), e);
+            }
+            else if (verPerfiles)
+            {
+                Seccion sec = Modelo.SeccionPorNombre(e.seccion);
+                barra = (sec != null && sec.TienePerfil)
+                    ? CrearPerfil(PosicionDe(a), PosicionDe(b), e, sec)
+                    : CrearCilindro(PosicionDe(a), PosicionDe(b), grosorBarra);
+            }
+            else
+            {
+                barra = CrearCilindro(PosicionDe(a), PosicionDe(b), grosorBarra);
+            }
             barra.name = "Elem_" + e.id + "_" + e.tipo;
             Pintar(barra, mostrarDeformada ? colorDeformada : ColorDe(e.tipo));
             barra.AddComponent<DatoElemento>().idElemento = e.id;
@@ -267,6 +286,55 @@ public class VisorEstructura : MonoBehaviour
         if (tipo == "columna") return colorColumna;
         if (tipo == "muro") return colorMuro;
         return colorViga;
+    }
+
+    // ============================================================
+    // PERFILES
+    // ============================================================
+    /// <summary>
+    /// Dibuja la barra con su seccion REAL (b x h), orientada segun sus
+    /// EJES LOCALES.
+    ///
+    /// La orientacion no se adivina: se usan los versores localX/localY/
+    /// localZ que vienen calculados desde Python con la misma convencion
+    /// de geomTransf que uso OpenSees. Por eso el perfil que se ve es
+    /// literalmente el que se calculo: si alguien cambiara vecxz en el
+    /// modelo, el dibujo giraria con el.
+    ///
+    /// Convencion: b va a lo largo del eje local y, h a lo largo del
+    /// local z. Para una viga con vecxz=(0,0,1) el local z es el
+    /// vertical, asi que h es el CANTO -- que es lo que uno espera ver.
+    /// </summary>
+    GameObject CrearPerfil(Vector3 desde, Vector3 hasta, Elemento e, Seccion sec)
+    {
+        GameObject caja = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        caja.transform.position = (desde + hasta) / 2f;
+
+        float largo = (hasta - desde).magnitude;
+
+        Vector3 ejeX = (hasta - desde).normalized;          // ya en Unity
+        Vector3 ejeZ = VectorUnity(e.localZ, Vector3.up);   // canto
+
+        // Si por lo que sea localZ resultara paralelo al eje de la
+        // barra, LookRotation devolveria basura: se usa un respaldo.
+        if (Mathf.Abs(Vector3.Dot(ejeX, ejeZ)) > 0.999f)
+            ejeZ = Mathf.Abs(ejeX.y) > 0.9f ? Vector3.forward : Vector3.up;
+
+        // forward = eje de la barra, up = canto.
+        // Queda: cubo Z = largo, cubo Y = h, cubo X = b.
+        caja.transform.rotation = Quaternion.LookRotation(ejeX, ejeZ);
+        caja.transform.localScale = new Vector3(sec.b, sec.h, largo);
+        return caja;
+    }
+
+    /// Pasa un vector en ejes OpenSees (como viene del JSON) a Unity.
+    /// Los VECTORES tienen que cruzar el mismo swap Z-Y que las
+    /// posiciones; si no, apuntan mal aunque el modelo se vea bien.
+    static Vector3 VectorUnity(float[] v, Vector3 porDefecto)
+    {
+        if (v == null || v.Length < 3) return porDefecto;
+        Vector3 r = Ejes.AUnity(v[0], v[1], v[2]);
+        return r.sqrMagnitude > 1e-8f ? r.normalized : porDefecto;
     }
 
     // ============================================================

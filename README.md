@@ -206,6 +206,38 @@ Capas que se prenden y apagan: nodos, vigas, columnas, muros, **apoyos,
 diafragmas, ejes locales, IDs, áreas tributarias**. Hay filtro por piso
 (con 1 232 elementos, mirar el edificio entero no sirve para revisar).
 
+**Perfiles reales.** El toggle *Perfiles (b × h)* dibuja cada barra con
+su sección verdadera en vez de un cilindro genérico: se ve que una viga
+es 30×80 y otra 30×60. La orientación usa los **ejes locales exportados
+desde Python**, así que el perfil que se ve es literalmente el que se
+calculó.
+
+**Deformada con escala.** Toggle *Ver deformada* + slider de ×1 a ×2000
+(y botones ×1 / ×100 / ×500 / ×1000). Los desplazamientos reales son de
+milímetros sobre un edificio de 28 m: sin amplificar no se ve nada. La
+escala es **puramente gráfica** — no toca el análisis.
+
+### Modificar el modelo en vivo (opcional)
+
+Se puede mover nodos, cambiar secciones, crear y borrar barras, y pedir
+un **reanálisis real**. Como la app compilada no puede correr OpenSees
+(es Python), Unity manda el modelo por HTTP y Python devuelve los
+resultados — la misma separación de siempre, ahora en vivo.
+
+Hay que levantar el servidor **antes** de abrir el visor:
+
+```bash
+.\.venv\Scripts\python.exe src\lanzar_unity.py servidor
+```
+
+Escucha solo en `127.0.0.1`. Sin él el visor funciona igual; solo no se
+puede reanalizar.
+
+> `tests/test_reanalisis.py` verifica que reanalizar desde el JSON
+> reproduzca **exactamente** el resultado de `modelo_edificio.py`
+> (diferencia 5×10⁻⁹ m). Sin esa comprobación, el servidor puede
+> resolver un problema levemente distinto y nadie se entera.
+
 Click sobre una barra y el panel contesta:
 `elementTag`, tipo, nodos, largo, **restricciones de cada apoyo por GDL**,
 **ejes locales**, **área tributaria**, **kN de losa que le llegan** y el

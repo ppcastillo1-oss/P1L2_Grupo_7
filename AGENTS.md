@@ -164,6 +164,25 @@ visor lo dibuja con su tamaño real, orientado con **el mismo `vecxz`**
 con que OpenSees orientó su inercia fuerte — así lo que se ve y lo que
 se calculó no pueden desincronizarse.
 
+### El JSON debe describir el MISMO problema que resolvió Python
+Si se modifica el modelo desde Unity, el reanálisis lo hace el servidor
+**reconstruyendo desde el JSON**. Si el JSON no describe exactamente el
+mismo problema, devuelve otros números y **no hay ningún error**. Pasó
+dos veces:
+
+1. El caso G exportado traía solo la carga de losa, **sin peso propio**
+   de vigas, columnas y muros → 10.04 mm donde Python daba 11.78.
+2. Las inercias se exportaban **ya cruzadas**, y el servidor —que cruza
+   según la geometría del elemento— las cruzaba **una segunda vez** →
+   12.17 mm.
+
+**Convención del contrato:** `Iy`/`Iz` van en **ejes de la sección**, no
+en los huecos de `ops.element()`. Quien construya el modelo aplica el
+cruce: horizontal → `Iy_slot = sec.Iz`; vertical → `Iy_slot = sec.Iy`.
+
+`tests/test_reanalisis.py` compara el reanálisis contra la deformada
+precalculada, nodo por nodo. Es la única forma de cazar esto.
+
 ### El JSON tiene que llegar a la build
 El visor lee `StreamingAssets/modelo_unity.json`. Al recalcular el modelo
 hay que copiarlo tanto al proyecto como a

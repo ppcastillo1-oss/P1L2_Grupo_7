@@ -241,6 +241,46 @@ def abrir_visor(construir_si_falta=True, esperar=False):
     return proc
 
 
+def abrir_servidor(puerto=5000):
+    r"""
+    Levanta el servidor de reanalisis en segundo plano.
+
+    Hace falta SOLO para modificar el modelo desde Unity (cambiar una
+    seccion, mover un nodo, borrar una barra) y volver a resolverlo. El
+    visor funciona sin el; simplemente no se puede reanalizar.
+
+    Por que hace falta un servidor: la app compilada NO puede correr
+    OpenSees (es Python). Entonces Unity manda el modelo por HTTP,
+    Python lo resuelve y devuelve los desplazamientos. Es la misma
+    separacion de siempre -- OpenSees calcula, Unity muestra -- solo que
+    ahora en vivo.
+
+    Escucha solo en 127.0.0.1: nadie fuera de este equipo llega.
+    """
+    servidor = os.path.join(_AQUI, 'servidor_opensees.py')
+    if not os.path.exists(servidor):
+        raise FileNotFoundError(servidor)
+
+    try:
+        import flask  # noqa: F401
+    except ImportError:
+        raise RuntimeError(
+            "Falta Flask. Instalalo con:\n"
+            "    .venv\\Scripts\\python.exe -m pip install flask")
+
+    print(f"Levantando el servidor de reanalisis en localhost:{puerto} ...")
+    proc = subprocess.Popen([sys.executable, servidor, '--puerto', str(puerto)])
+    time.sleep(2.0)
+    if proc.poll() is not None:
+        raise RuntimeError(
+            f"El servidor se cerro de inmediato (codigo {proc.returncode}). "
+            f"Puede que el puerto {puerto} este ocupado.")
+    print("Servidor arriba. En el visor, el panel del editor ya puede")
+    print("modificar el modelo y pedir un reanalisis.")
+    print("Para detenerlo: proc.terminate() o cerrar esta consola.")
+    return proc
+
+
 def abrir_editor(version=None):
     """
     Abre el proyecto en el editor de Unity (para trabajar en el visor).
@@ -261,5 +301,11 @@ if __name__ == '__main__':
         abrir_editor()
     elif modo == 'build':
         construir_app(forzar='--forzar' in sys.argv)
+    elif modo == 'servidor':
+        proc = abrir_servidor()
+        try:
+            proc.wait()          # queda en primer plano hasta Ctrl+C
+        except KeyboardInterrupt:
+            proc.terminate()
     else:
         abrir_visor()

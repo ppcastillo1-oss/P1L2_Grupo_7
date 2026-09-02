@@ -45,6 +45,15 @@ public static class ConfigurarEscena
         VisorEstructura visor = Obtener<VisorEstructura>(goVisor);
         VisorQA qa = Obtener<VisorQA>(goVisor);
 
+        // --- Analizador + Editor (modificar el modelo en vivo) ---
+        // Necesitan el servidor Flask corriendo:
+        //     python src/servidor_opensees.py
+        // Sin el, el visor funciona igual: solo no se puede reanalizar.
+        GameObject goAnalizador = GameObject.Find("Analizador");
+        if (goAnalizador == null) goAnalizador = new GameObject("Analizador");
+        AnalizadorEstructural analizador = Obtener<AnalizadorEstructural>(goAnalizador);
+        EditorEstructura editor = Obtener<EditorEstructura>(goAnalizador);
+
         // --- Camara ---
         Camera cam = Camera.main;
         if (cam == null)
@@ -65,8 +74,20 @@ public static class ConfigurarEscena
         qa.orbital = orbital;
         orbital.visor = visor;
 
+        analizador.visor = visor;
+        // Al iniciar NO se consulta al servidor: la app tiene que abrir
+        // igual aunque el servidor no este corriendo. El reanalisis se
+        // dispara a mano desde el panel del editor.
+        analizador.analizarAlIniciar = false;
+
+        editor.visor = visor;
+        editor.analizador = analizador;
+        editor.camara = orbital;
+
         EditorUtility.SetDirty(qa);
         EditorUtility.SetDirty(orbital);
+        EditorUtility.SetDirty(analizador);
+        EditorUtility.SetDirty(editor);
         EditorSceneManager.MarkSceneDirty(escena);
         EditorSceneManager.SaveScene(escena);
 

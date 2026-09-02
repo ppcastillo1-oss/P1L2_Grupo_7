@@ -129,6 +129,7 @@ GameObject:
   m_Component:
   - component: {fileID: 212550391}
   - component: {fileID: 212550390}
+  - component: {fileID: 212550392}
   m_Layer: 0
   m_Name: Analizador
   m_TagString: Untagged
@@ -153,7 +154,7 @@ MonoBehaviour:
   visor: {fileID: 258344397}
   casoActivo: G
   mandarTodosLosCasos: 1
-  analizarAlIniciar: 1
+  analizarAlIniciar: 0
 --- !u!4 &212550391
 Transform:
   m_ObjectHideFlags: 0
@@ -169,6 +170,24 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &212550392
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 212550389}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d6758e130b6bfa42a702bf0d7891cc7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EditorEstructura
+  visor: {fileID: 258344397}
+  analizador: {fileID: 212550390}
+  camara: {fileID: 330585548}
+  colorSeleccion: {r: 1, g: 0.85, b: 0.15, a: 1}
+  anchoPanel: 310
+  pasoRejilla: 0.25
 --- !u!1 &258344396
 GameObject:
   m_ObjectHideFlags: 0
@@ -211,6 +230,7 @@ MonoBehaviour:
   colorDeformada: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   mostrarDeformada: 0
   factorEscala: 300
+  verPerfiles: 0
   verNodos: 1
   verNodosAuxiliares: 1
   verColumnas: 1

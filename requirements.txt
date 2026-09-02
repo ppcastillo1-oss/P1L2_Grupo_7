@@ -9,6 +9,11 @@ openseespy>=3.8.0      # motor de calculo (OpenSees)
 # --- Lectura de planos ---
 ezdxf>=1.4.0           # extraccion de muros y ejes desde los DXF
 
+# --- Servidor de reanalisis (opcional) ---
+# Solo hace falta para MODIFICAR el modelo desde Unity y volver a
+# resolverlo en vivo. El resto del laboratorio corre sin esto.
+flask>=3.0
+
 # --- Notebook ---
 jupyterlab>=4.0        # entorno para laboratorio.ipynb
 ipykernel>=6.0
