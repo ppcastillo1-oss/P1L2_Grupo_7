@@ -52,6 +52,16 @@ public class EditorEstructura : MonoBehaviour
     public Color colorSeleccion = new Color(1f, 0.85f, 0.15f);
     public float anchoPanel = 310f;
 
+    // El panel del editor va a la DERECHA. VisorQA ocupa la esquina
+    // superior izquierda con sus toggles de capas, y ambos dibujaban en
+    // (10,10): el texto de este quedaba encima de las casillas del otro
+    // y no se podian marcar.
+    Rect RectPanel()
+    {
+        return new Rect(Screen.width - anchoPanel - 10, 10,
+                        anchoPanel, Screen.height - 20);
+    }
+
     [Header("Edicion")]
     [Tooltip("Redondea las coordenadas al mover un nodo con el mouse. "
            + "0 = sin redondeo.")]
@@ -104,9 +114,16 @@ public class EditorEstructura : MonoBehaviour
         ManejarTeclas();
     }
 
-    bool MouseSobrePanel()
+    /// Publico para que VisorQA tampoco deje pasar los clicks que caen
+    /// sobre este panel: si no, marcar algo aca seleccionaria ademas la
+    /// barra que hubiera detras.
+    public bool MouseSobrePanel()
     {
-        return Input.mousePosition.x < anchoPanel;
+        // El origen de GUI esta arriba-izquierda y el de mousePosition
+        // abajo-izquierda: hay que invertir la Y antes de comparar.
+        Vector2 p = new Vector2(Input.mousePosition.x,
+                                Screen.height - Input.mousePosition.y);
+        return RectPanel().Contains(p);
     }
 
     void ManejarClick()
@@ -484,8 +501,7 @@ public class EditorEstructura : MonoBehaviour
         if (visor == null || visor.Modelo == null) return;
         ModeloEstructural M = visor.Modelo;
 
-        GUILayout.BeginArea(new Rect(10, 10, anchoPanel, Screen.height - 20),
-                            GUI.skin.box);
+        GUILayout.BeginArea(RectPanel(), GUI.skin.box);
         scrollPanel = GUILayout.BeginScrollView(scrollPanel);
 
         GUILayout.Label("<b>MODELO</b>" + (modificado ? "  (modificado)" : ""),

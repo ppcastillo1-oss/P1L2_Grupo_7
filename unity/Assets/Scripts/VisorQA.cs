@@ -161,12 +161,21 @@ public class VisorQA : MonoBehaviour
 
     /// El origen de GUI esta arriba-izquierda y el de Input.mousePosition
     /// abajo-izquierda: hay que invertir la Y antes de comparar.
+    ///
+    /// Se consulta tambien el panel del EDITOR (que vive a la derecha):
+    /// un click sobre el no debe atravesar y seleccionar la barra que
+    /// haya detras.
     bool MouseSobrePanel()
     {
         Vector2 p = new Vector2(Input.mousePosition.x,
                                 Screen.height - Input.mousePosition.y);
-        return RectPanel().Contains(p);
+        if (RectPanel().Contains(p)) return true;
+
+        if (editor == null) editor = FindAnyObjectByType<EditorEstructura>();
+        return editor != null && editor.MouseSobrePanel();
     }
+
+    private EditorEstructura editor;
 
     Elemento BuscarElemento(int id)
     {
