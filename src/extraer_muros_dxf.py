@@ -260,6 +260,52 @@ def orientacion(m):
 
 
 # ============================================================
+def auditar(segs, muros_todos, muros_dentro):
+    r"""
+    Informa QUE SE PERDIO en el camino.
+
+    Esta extraccion es una interpretacion automatica de un dibujo, no
+    una lectura exacta del modelo estructural: el plano no dice "esto
+    es un muro de 0.30", solo tiene lineas. Por eso hay que declarar
+    cuanto quedo fuera, en vez de reportar solo los muros encontrados y
+    dar a entender que son todos.
+    """
+    print("\n" + "=" * 60)
+    print(" AUDITORIA DE LA EXTRACCION")
+    print("=" * 60)
+
+    cortos = [s for s in segs if _largo(s) < LARGO_MIN]
+    print(f"  segmentos en la capa            : {len(segs)}")
+    print(f"  descartados por medir < {LARGO_MIN} m   : {len(cortos)}")
+    if cortos:
+        mayor = max(_largo(s) for s in cortos)
+        print(f"     (el mayor descartado mide {mayor:.2f} m)")
+
+    utiles = [s for s in segs if _largo(s) >= LARGO_MIN]
+    sin_pareja = len(utiles) - 2 * len(muros_todos)
+    print(f"  caras largas emparejadas        : {2 * len(muros_todos)}")
+    print(f"  caras largas SIN PAREJA         : {sin_pareja}")
+
+    fuera = [m for m in muros_todos if not dentro_de_planta(m)]
+    print(f"  pares fuera de la planta        : {len(fuera)}")
+    for m in fuera:
+        print(f"     ({m['x1']:.2f},{m['y1']:.2f})-({m['x2']:.2f},{m['y2']:.2f})"
+              f"  largo {m['largo']:.2f}  esp {m['espesor']:.2f}")
+
+    print(f"\n  MUROS MODELADOS                 : {len(muros_dentro)}")
+
+    if sin_pareja > 0 or fuera:
+        print("\n  ATENCION: la extraccion NO es exhaustiva.")
+        print("  - Una cara sin pareja suele ser un muro cuya otra cara")
+        print("    quedo cortada en tramos cortos (puertas, vanos), o un")
+        print("    muro con tres lineas paralelas donde el emparejado")
+        print("    'cara mas cercana' eligio la combinacion equivocada.")
+        print("  - Los pares fuera de la planta son muros reales del")
+        print("    edificio en zonas que la malla de ejes no cubre.")
+        print("  Contrastar contra el plano antes de darlos por completos.")
+    print("=" * 60)
+
+
 def main():
     ruta = os.path.abspath(PLANO)
     if not os.path.exists(ruta):
@@ -272,10 +318,10 @@ def main():
     print(f"  con largo >= {LARGO_MIN} m       : "
           f"{sum(1 for s in segs if _largo(s) >= LARGO_MIN)}")
 
-    muros = emparejar_caras(segs)
-    print(f"  pares de caras emparejados: {len(muros)}")
+    muros_todos = emparejar_caras(segs)
+    print(f"  pares de caras emparejados: {len(muros_todos)}")
 
-    muros = [m for m in muros if dentro_de_planta(m)]
+    muros = [m for m in muros_todos if dentro_de_planta(m)]
     print(f"  dentro de la planta       : {len(muros)}")
 
     muros.sort(key=lambda m: -m['largo'])
@@ -305,6 +351,8 @@ def main():
             'muros': muros,
         }, f, indent=2, ensure_ascii=False)
     print(f"\nEscrito: {salida}")
+
+    auditar(segs, muros_todos, muros)
     return 0
 
 

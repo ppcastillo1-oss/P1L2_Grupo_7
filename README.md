@@ -108,6 +108,18 @@ python tests/test_contrato_unity.py
 
 ---
 
+## Para entender el modelo
+
+📘 **[`docs/GUIA_conceptos.md`](docs/GUIA_conceptos.md)** — qué es cada
+cosa y por qué está ahí: GDL, apoyos, ejes locales, IDs, diafragma
+rígido, áreas tributarias, muros equivalentes, superposición, las 5
+verificaciones y las limitaciones del modelo.
+
+Material de estudio para la **defensa individual**: una demo que
+funciona pero que el grupo no sabe explicar no cuenta como lograda.
+
+---
+
 ## Estructura
 
 ```

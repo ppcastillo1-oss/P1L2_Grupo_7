@@ -407,6 +407,24 @@ Con `py = .\.venv\Scripts\python.exe`:
 - Los muros van como columna ancha (comportamiento axial-flexural), sin
   captura de corte ni de acoplamiento con las vigas más allá del
   diafragma.
+- **La extracción de muros no es exhaustiva.** El script imprime su
+  propia auditoría al correr:
+
+  | | |
+  |---|---|
+  | Segmentos en la capa `RLE-MURO` | 163 |
+  | Descartados por medir < 1.0 m | 102 (el mayor: 0.85 m) |
+  | Caras largas **sin pareja** | 7 (la mayor: 9.30 m en y = 64.15) |
+  | Pares **fuera** de la malla de ejes modelada | 3 (uno de 11.03 m) |
+  | **Muros modelados** | **24** |
+
+  Una cara sin pareja suele ser un muro cuya otra cara quedó cortada en
+  tramos cortos por puertas o vanos, o un muro con tres líneas paralelas
+  donde el emparejado *"cara más cercana"* eligió la combinación
+  equivocada — de esa ambigüedad no se sale solo con geometría, hay que
+  contrastar contra el plano. Los pares fuera de la planta son muros
+  reales en zonas que la malla de 8×6 ejes no cubre.
+
 - Se asume que los 24 muros extraídos del piso 1 son continuos hasta el
   nivel 8. Verificar contra las plantas superiores queda pendiente.
 - Se modelan 8 ejes en X y 6 en Y; el plano tiene más ejes secundarios
