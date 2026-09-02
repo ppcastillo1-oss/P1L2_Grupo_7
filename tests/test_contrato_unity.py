@@ -139,6 +139,60 @@ check(t0['area'] > 0 and len(t0['vertices']) >= 3,
       "las areas tributarias traen area y poligono")
 
 
+# ------------------------------------------------------------
+# Los poligonos NO miden todos lo mismo: una viga interior toma un
+# TRAPECIO de un pano (4 vertices) y un TRIANGULO del otro (3).
+# Sin 'tamanos', Unity partia los vertices por division entera
+# (7 / 2 = 3) y dibujaba lineas cruzadas que no existen. Este bloque
+# existe para que ese bug no vuelva.
+# ------------------------------------------------------------
+sin_tam = [t['elemento'] for t in datos['areas_tributarias']
+           if not t.get('tamanos')]
+check(not sin_tam,
+      "toda area tributaria declara el tamano de cada poligono",
+      f"sin 'tamanos': {len(sin_tam)}" if sin_tam else "")
+
+descuadres = [t['elemento'] for t in datos['areas_tributarias']
+              if sum(t.get('tamanos', [])) != len(t['vertices'])]
+check(not descuadres,
+      "sum(tamanos) = cantidad de vertices",
+      f"descuadrados: {descuadres[:5]}" if descuadres else "")
+
+degenerados = [t['elemento'] for t in datos['areas_tributarias']
+               if any(k < 3 for k in t.get('tamanos', []))]
+check(not degenerados,
+      "ningun poligono tiene menos de 3 vertices")
+
+mal_contados = [t['elemento'] for t in datos['areas_tributarias']
+                if len(t.get('tamanos', [])) != t['n_poligonos']]
+check(not mal_contados,
+      "len(tamanos) = n_poligonos")
+
+# El caso que estaba roto tiene que existir de verdad en los datos; si
+# no, este test estaria pasando por vacio.
+mixtos = [t for t in datos['areas_tributarias']
+          if len(set(t.get('tamanos', []))) > 1]
+check(len(mixtos) > 0,
+      "hay vigas con poligonos de distinto tamano (el caso que fallaba)",
+      f"{len(mixtos)} vigas mezclan trapecio y triangulo")
+
+# ------------------------------------------------------------
+# Muros: sin largo/espesor el visor los dibuja como columnas flacas.
+# ------------------------------------------------------------
+muros = [e for e in datos['elementos'] if e['tipo'] == 'muro']
+if muros:
+    sin_geom = [m['id'] for m in muros
+                if m.get('largo', 0) <= 0 or m.get('espesor', 0) <= 0]
+    check(not sin_geom,
+          "los muros traen largo y espesor para dibujarlos",
+          f"sin geometria: {len(sin_geom)}" if sin_geom else "")
+
+    sin_vec = [m['id'] for m in muros
+               if not m.get('vecxz') or len(m['vecxz']) < 3]
+    check(not sin_vec,
+          "los muros traen vecxz (orientacion de su eje fuerte)")
+
+
 # ============================================================
 print("\n[3] Coherencia numerica de lo exportado")
 # ============================================================

@@ -375,17 +375,19 @@ public class VisorQA : MonoBehaviour
 
     void DibujarPoligonos(AreaTributaria t)
     {
-        int n = t.vertices.Length;
-        int porPoligono = (t.n_poligonos > 0) ? n / t.n_poligonos : n;
-        if (porPoligono < 3) porPoligono = n;
-
-        for (int p = 0; p < n; p += porPoligono)
+        // Cada poligono se cierra sobre SI MISMO. La particion viene de
+        // AreaTributaria.Poligonos(), que usa los tamanos reales: antes
+        // se dividia vertices.Length entre n_poligonos y, cuando una
+        // viga tomaba un trapecio (4 vertices) de un pano y un triangulo
+        // (3) del otro, la division entera 7/2 = 3 mezclaba vertices de
+        // ambos y aparecian lineas cruzadas inexistentes.
+        foreach (int[] rango in t.Poligonos())
         {
-            int fin = Mathf.Min(p + porPoligono, n);
-            for (int i = p; i < fin; i++)
+            int inicio = rango[0], cuantos = rango[1];
+            for (int k = 0; k < cuantos; k++)
             {
-                VerticePlanta v1 = t.vertices[i];
-                VerticePlanta v2 = t.vertices[(i + 1 - p) % (fin - p) + p];
+                VerticePlanta v1 = t.vertices[inicio + k];
+                VerticePlanta v2 = t.vertices[inicio + (k + 1) % cuantos];
                 // El poligono esta en PLANTA (x, y de OpenSees) a la
                 // cota del piso.
                 Vector3 a = Ejes.AUnity(v1.x, v1.y, t.z);

@@ -141,6 +141,29 @@ Shaders*. Lo hace solo `ConstruirApp.AsegurarShadersIncluidos()`.
 > gracia**: si se mata a la fuerza, el log queda sin vaciar y parece que
 > no pasó nada.
 
+### Los polígonos tributarios no miden todos lo mismo
+`JsonUtility` no lee listas de listas, así que los polígonos van
+**concatenados** en `vertices`. Es tentador partirlos dividiendo
+`vertices.Length / n_poligonos`, pero **está mal**: una viga interior
+toma un **trapecio** de un paño (4 vértices) y un **triángulo** del otro
+(3), o sea 7 en total, y `7 / 2 = 3` mezcla vértices de un polígono con
+los del otro → **líneas cruzadas que no existen** en el diagrama.
+
+Afectaba a 88 de las 656 vigas. Por eso el JSON exporta `tamanos`
+(vértices por polígono) y `AreaTributaria.Poligonos()` lo usa.
+`test_contrato_unity.py` verifica que existan, que `sum(tamanos)` calce
+y —importante— que **haya de verdad vigas con polígonos de distinto
+tamaño**, para que el test no pase por vacío.
+
+### Un muro dibujado como barra no se puede revisar
+El muro se idealiza como "columna ancha": UNA barra en su eje
+baricéntrico. Correcto para el cálculo, pero si se dibuja tal cual se ve
+una columna flaca en medio del vano y no hay forma de juzgar si está
+donde dice el plano. El JSON exporta `largo` y `espesor` del muro y el
+visor lo dibuja con su tamaño real, orientado con **el mismo `vecxz`**
+con que OpenSees orientó su inercia fuerte — así lo que se ve y lo que
+se calculó no pueden desincronizarse.
+
 ### El JSON tiene que llegar a la build
 El visor lee `StreamingAssets/modelo_unity.json`. Al recalcular el modelo
 hay que copiarlo tanto al proyecto como a

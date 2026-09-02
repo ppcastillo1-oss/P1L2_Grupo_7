@@ -118,13 +118,19 @@ def main():
     VEC_HORIZONTAL = (0.0, 0.0, 1.0)
     elementos = []
 
-    def agregar(tag, ni, nj, tipo, seccion, vecxz):
+    def agregar(tag, ni, nj, tipo, seccion, vecxz, largo=0.0, espesor=0.0):
         ex, ey, ez = ejes_locales(coords[ni], coords[nj], vecxz)
         elementos.append({
             'id': tag, 'n1': ni, 'n2': nj,
             'tipo': tipo, 'seccion': seccion,
             'vecxz': r6(vecxz),
             'localX': r6(ex), 'localY': r6(ey), 'localZ': r6(ez),
+            # Solo para muros: su tamano REAL en planta. La barra
+            # equivalente vive en el eje baricentrico, asi que sin estos
+            # dos numeros Unity la dibujaria como una columna delgada y
+            # no se podria juzgar si el muro esta donde dice el plano.
+            'largo': round(float(largo), 4),
+            'espesor': round(float(espesor), 4),
         })
 
     for (tag, ni, nj) in topo['columnas']:
@@ -136,7 +142,8 @@ def main():
     for m in topo['muros']:
         dx, dy = m['dir']
         agregar(m['tag'], m['ni'], m['nj'], 'muro',
-                f"MURO_{m['muro_id']}", (dx, dy, 0.0))
+                f"MURO_{m['muro_id']}", (dx, dy, 0.0),
+                largo=m['largo'], espesor=m['espesor'])
 
     # ---------- Secciones ----------
     secciones = []
@@ -160,10 +167,23 @@ def main():
         tipo = 'X' if (tag, ni, nj, lev, ix, iy) in topo['vigas_x'] else 'Y'
         reg = trib[(tipo, ix, iy)]
         w = at.carga_lineal(M.Q_G, reg['area'], reg['luz'])
+
+        # Los poligonos van CONCATENADOS en 'vertices' (JsonUtility de
+        # Unity no lee listas de listas), y 'tamanos' dice cuantos
+        # vertices tiene cada uno.
+        #
+        # OJO: no se puede asumir que todos midan lo mismo. Una viga
+        # interior suele tomar un TRAPECIO de un pano (4 vertices) y un
+        # TRIANGULO del otro (3): 7 en total. Repartirlos como 7/2 = 3
+        # mezcla vertices de un poligono con los del otro y dibuja
+        # lineas que no existen.
         poli = []
+        tamanos = []
         for p in reg['poligonos']:
+            tamanos.append(len(p))
             for (px, py) in p:
                 poli.append({'x': round(px, 4), 'y': round(py, 4)})
+
         tributarias.append({
             'elemento': tag,
             'nivel': lev,
@@ -174,6 +194,7 @@ def main():
             'w': round(w, 6),
             'z': round(M.NIVELES_Z[lev], 4),
             'vertices': poli,
+            'tamanos': tamanos,
             'n_poligonos': len(reg['poligonos']),
         })
 

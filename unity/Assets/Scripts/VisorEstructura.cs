@@ -237,7 +237,9 @@ public class VisorEstructura : MonoBehaviour
                 continue;
             }
 
-            GameObject barra = CrearCilindro(PosicionDe(a), PosicionDe(b), grosorBarra);
+            GameObject barra = (e.EsMuro && e.largo > 0.01f)
+                ? CrearPlacaMuro(PosicionDe(a), PosicionDe(b), e)
+                : CrearCilindro(PosicionDe(a), PosicionDe(b), grosorBarra);
             barra.name = "Elem_" + e.id + "_" + e.tipo;
             Pintar(barra, mostrarDeformada ? colorDeformada : ColorDe(e.tipo));
             barra.AddComponent<DatoElemento>().idElemento = e.id;
@@ -265,6 +267,51 @@ public class VisorEstructura : MonoBehaviour
         if (tipo == "columna") return colorColumna;
         if (tipo == "muro") return colorMuro;
         return colorViga;
+    }
+
+    // ============================================================
+    // MUROS
+    // ============================================================
+    /// <summary>
+    /// Dibuja un muro con su tamano REAL en planta (largo x espesor),
+    /// no como una barra delgada.
+    ///
+    /// POR QUE
+    /// El muro se idealiza como "columna ancha": UNA barra vertical en
+    /// su eje baricentrico. Eso es correcto para el calculo, pero si se
+    /// dibuja tal cual se ve una columna flaca en medio del vano y es
+    /// imposible juzgar si el muro esta donde dice el plano, ni hacia
+    /// donde apunta su eje fuerte.
+    ///
+    /// La orientacion sale de 'vecxz', que en un muro apunta en la
+    /// direccion del muro en planta -- el MISMO vector con el que
+    /// OpenSees oriento su inercia fuerte. Asi lo que se ve y lo que se
+    /// calculo no pueden desincronizarse.
+    /// </summary>
+    GameObject CrearPlacaMuro(Vector3 desde, Vector3 hasta, Elemento e)
+    {
+        GameObject caja = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        caja.transform.position = (desde + hasta) / 2f;
+
+        float alto = (hasta - desde).magnitude;
+
+        // vecxz viene en ejes OpenSees (x, y de planta): hay que pasarlo
+        // por el mismo swap que las posiciones.
+        Vector3 dir = Vector3.right;
+        if (e.vecxz != null && e.vecxz.Length >= 2)
+        {
+            Vector3 d = Ejes.AUnity(e.vecxz[0], e.vecxz[1], 0f);
+            if (d.sqrMagnitude > 1e-8f) dir = d.normalized;
+        }
+
+        // El cubo queda: X = largo del muro, Y = alto de piso,
+        // Z = espesor. Rotarlo para que su X apunte a lo largo del muro.
+        caja.transform.rotation = Quaternion.LookRotation(
+            Vector3.Cross(dir, Vector3.up).normalized, Vector3.up);
+        caja.transform.localScale = new Vector3(
+            Mathf.Max(e.largo, 0.05f), alto, Mathf.Max(e.espesor, 0.05f));
+
+        return caja;
     }
 
     // Unity no tiene "linea gruesa 3D": se usa un cilindro estirado.

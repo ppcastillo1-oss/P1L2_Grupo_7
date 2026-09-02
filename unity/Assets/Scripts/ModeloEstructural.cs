@@ -109,6 +109,15 @@ public class Elemento
     public float[] localX;
     public float[] localY;
     public float[] localZ;
+
+    // Solo para tipo == "muro": su tamano real en planta.
+    // El muro se modela como UNA barra en su eje baricentrico ("columna
+    // ancha"), asi que sin esto se dibujaria como una columna delgada y
+    // no se podria comparar contra el plano.
+    public float largo;
+    public float espesor;
+
+    public bool EsMuro { get { return tipo == "muro"; } }
 }
 
 
@@ -134,12 +143,41 @@ public class AreaTributaria
     public float carga_total;      // kN   = qG * area
     public float w;                // kN/m = carga_total / luz
     public float z;                // cota del piso
+    // Los poligonos vienen CONCATENADOS (JsonUtility no lee listas de
+    // listas) y 'tamanos' dice cuantos vertices tiene cada uno.
     public VerticePlanta[] vertices;
-
-    // Una viga interior toma area de DOS panos (uno a cada lado), una
-    // de borde de uno solo. 'vertices' trae los poligonos concatenados,
-    // asi que hay que saber cuantos son para dibujarlos separados.
+    public int[] tamanos;
     public int n_poligonos;
+
+    /// <summary>
+    /// Recorre los poligonos devolviendo (inicio, cantidad) de cada uno.
+    ///
+    /// NO se puede dividir vertices.Length entre n_poligonos: los
+    /// poligonos NO miden todos lo mismo. Una viga interior toma un
+    /// TRAPECIO de un pano (4 vertices) y un TRIANGULO del otro (3),
+    /// o sea 7 en total; repartir 7/2 = 3 mezcla los vertices de uno
+    /// con los del otro y dibuja lineas cruzadas que no existen.
+    /// </summary>
+    public System.Collections.Generic.IEnumerable<int[]> Poligonos()
+    {
+        if (vertices == null || vertices.Length < 3) yield break;
+
+        if (tamanos != null && tamanos.Length > 0)
+        {
+            int inicio = 0;
+            foreach (int cuantos in tamanos)
+            {
+                if (cuantos >= 3 && inicio + cuantos <= vertices.Length)
+                    yield return new[] { inicio, cuantos };
+                inicio += cuantos;
+            }
+            yield break;
+        }
+
+        // Sin 'tamanos' (JSON viejo): al menos dibujar todo como UN
+        // poligono, que es preferible a inventar una particion mala.
+        yield return new[] { 0, vertices.Length };
+    }
 }
 
 [System.Serializable]
