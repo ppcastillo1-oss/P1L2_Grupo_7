@@ -311,7 +311,20 @@ haya elementos huérfanos. **Pasa.**
 
 ## 5. Reproducibilidad
 
-### 5.1 El laboratorio completo en un notebook
+### 5.1 Puesta en marcha
+
+El repo es **autocontenido**: trae su propio entorno virtual y no depende
+de nada instalado fuera. Después de clonar, una sola vez:
+
+```bash
+.\setup.ps1
+```
+
+Crea `.venv`, instala `requirements.txt` y verifica si está Unity en la
+versión que el proyecto exige (avisa, pero no bloquea: el modelo y las
+verificaciones corren sin Unity; solo el visor 3D la necesita).
+
+### 5.2 El laboratorio completo en un notebook
 
 `laboratorio.ipynb` corre toda la cadena de principio a fin:
 
@@ -320,8 +333,7 @@ planos DXF → geometría → áreas tributarias → OpenSees → verificaciones
 ```
 
 ```bash
-python -m pip install -r requirements.txt
-jupyter lab laboratorio.ipynb
+.\lab.ps1
 ```
 
 Incluye la **visualización del reparto tributario en planta** (matplotlib),
@@ -341,19 +353,38 @@ notebook**.
 > proyecto con otra versión hace que Unity migre los assets, que es una
 > fuente clásica de conflictos en un repo compartido.
 
-### 5.2 Por línea de comandos
+### 5.3 Por línea de comandos
+
+Con `py = .\.venv\Scripts\python.exe`:
 
 ```bash
-python src/extraer_muros_dxf.py     # muros desde el plano
-python verificar_lab2.py            # las 5 verificaciones
-python src/exportar_unity.py        # JSON para Unity
-python src/lanzar_unity.py          # abrir el visor
-python tests/test_areas_tributarias.py
-python tests/test_contrato_unity.py
+.\.venv\Scripts\python.exe src\extraer_muros_dxf.py
+```
+
+```bash
+.\.venv\Scripts\python.exe verificar_lab2.py
+```
+
+```bash
+.\.venv\Scripts\python.exe src\exportar_unity.py
+```
+
+```bash
+.\.venv\Scripts\python.exe src\lanzar_unity.py
+```
+
+```bash
+.\.venv\Scripts\python.exe tests\test_areas_tributarias.py
+```
+
+```bash
+.\.venv\Scripts\python.exe tests\test_contrato_unity.py
 ```
 
 | Archivo | Rol |
 |---|---|
+| `setup.ps1` | crea `.venv` e instala todo (una vez tras clonar) |
+| `lab.ps1` | abre el notebook |
 | `laboratorio.ipynb` | **el laboratorio completo, celda por celda** |
 | `src/modelo_edificio.py` | fuente de verdad: geometría, secciones, cargas |
 | `src/areas_tributarias.py` | reparto 45°, polígonos, conservación |

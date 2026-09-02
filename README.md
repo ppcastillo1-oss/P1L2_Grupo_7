@@ -27,36 +27,45 @@ Las **5 verificaciones del Lab pasan**: `python verificar_lab2.py`
 
 ## Cómo correrlo
 
-### Opción A — el notebook (recomendado)
+### 1. Una sola vez, después de clonar
+
+```bash
+.\setup.ps1
+```
+
+Crea el entorno virtual `.venv` dentro del repo, instala todo y avisa si
+falta Unity. Si PowerShell bloquea el script, correr antes en esa misma
+terminal:
+
+```bash
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+```
+
+### 2. El notebook (recomendado)
 
 Todo el laboratorio de principio a fin, celda por celda: geometría →
 áreas tributarias (con gráficos) → OpenSees → verificaciones → JSON →
 **abre el visor 3D desde el propio notebook**.
 
 ```bash
-python -m pip install -r requirements.txt
-```
-
-```bash
-jupyter lab laboratorio.ipynb
+.\lab.ps1
 ```
 
 Luego `Kernel → Restart & Run All`, o celda por celda para la defensa.
 
-### Opción B — por línea de comandos
+### 3. O por línea de comandos
+
+Las 5 verificaciones (carga de losa, suma de áreas tributarias,
+conservación, equilibrio, compatibilidad del diafragma):
 
 ```bash
-python verificar_lab2.py
+.\.venv\Scripts\python.exe verificar_lab2.py
 ```
 
-Eso construye el modelo, lo resuelve y corre las 5 verificaciones
-(carga de losa, suma de áreas tributarias, conservación, equilibrio,
-compatibilidad del diafragma).
-
-Para abrir el visor sin notebook:
+Abrir el visor sin notebook:
 
 ```bash
-python src/lanzar_unity.py
+.\.venv\Scripts\python.exe src\lanzar_unity.py
 ```
 
 Para regenerar el JSON que consume Unity:
