@@ -567,6 +567,7 @@ public class EditorEstructura : MonoBehaviour
         visor.verColumnas = GUILayout.Toggle(visor.verColumnas, "Col.");
         visor.verVigas = GUILayout.Toggle(visor.verVigas, "Vigas");
         visor.verMuros = GUILayout.Toggle(visor.verMuros, "Muros");
+        visor.verBrazos = GUILayout.Toggle(visor.verBrazos, "Brazos");
         GUILayout.EndHorizontal();
 
         GUILayout.BeginHorizontal();

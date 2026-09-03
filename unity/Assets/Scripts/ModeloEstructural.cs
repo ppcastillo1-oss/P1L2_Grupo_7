@@ -104,7 +104,7 @@ public class Elemento
     public int id;
     public int n1, n2;             // nodos que conecta
     public string seccion;         // debe existir en la lista de secciones
-    public string tipo;            // "columna", "viga_x", "viga_y", "muro"
+    public string tipo;            // "columna", "viga_x", "viga_y", "muro", "brazo"
 
     // Orienta el eje fuerte de la seccion. Vacio = automatico segun la
     // geometria. Necesario para muros: hacia donde apunta su plano.
@@ -125,7 +125,14 @@ public class Elemento
     public float largo;
     public float espesor;
 
+    // Hacia donde corre el LARGO del muro en planta (x, y de OpenSees).
+    // Viene calculado desde Python. NO se deduce de vecxz: en un muro
+    // vecxz es la NORMAL al muro, no su direccion, y deducirlo dibujaba
+    // todos los muros girados 90 grados.
+    public float[] dir_largo;
+
     public bool EsMuro { get { return tipo == "muro"; } }
+    public bool EsBrazo { get { return tipo == "brazo"; } }
 }
 
 

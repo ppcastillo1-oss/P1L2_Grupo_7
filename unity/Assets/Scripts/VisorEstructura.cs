@@ -43,6 +43,7 @@ public class VisorEstructura : MonoBehaviour
     public Color colorColumna = new Color(0.36f, 0.62f, 1f);    // azul
     public Color colorViga = new Color(0.88f, 0.48f, 0.37f);    // naranjo
     public Color colorMuro = new Color(0.65f, 0.65f, 0.70f);    // gris
+    public Color colorBrazo = new Color(0.85f, 0.30f, 0.75f);   // magenta
     public Color colorApoyo = new Color(0.18f, 0.60f, 0.37f);   // verde
     public Color colorNodoAuxiliar = new Color(0.55f, 0.58f, 0.62f); // gris
     public Color colorDeformada = Color.yellow;
@@ -66,6 +67,10 @@ public class VisorEstructura : MonoBehaviour
     public bool verColumnas = true;
     public bool verVigas = true;
     public bool verMuros = true;
+    [Tooltip("Brazos rigidos: el pedazo de muro entre el extremo real de "
+           + "una viga y el baricentro donde vive la columna ancha, y las "
+           + "esquinas donde dos muros son una sola pieza de hormigon.")]
+    public bool verBrazos = true;
 
     // --- Estado ---
     /// El modelo cargado. AnalizadorEstructural lo lee para mandarlo
@@ -248,6 +253,17 @@ public class VisorEstructura : MonoBehaviour
             {
                 barra = CrearPlacaMuro(PosicionDe(a), PosicionDe(b), e);
             }
+            else if (e.EsBrazo)
+            {
+                // Un brazo rigido NO se dibuja con su seccion: su b x h
+                // es un artificio numerico (4 x 4 m, la seccion de viga
+                // mayor escalada para que sea rigida de verdad). Con
+                // perfiles activados salia un cajon de 4 m atravesado.
+                // Lo que hay ahi fisicamente es muro, y el muro ya se
+                // dibuja aparte; el brazo va como linea fina.
+                barra = CrearCilindro(PosicionDe(a), PosicionDe(b),
+                                      grosorBarra * 0.6f);
+            }
             else if (verPerfiles)
             {
                 Seccion sec = Modelo.SeccionPorNombre(e.seccion);
@@ -278,6 +294,7 @@ public class VisorEstructura : MonoBehaviour
     {
         if (tipo == "columna") return verColumnas;
         if (tipo == "muro") return verMuros;
+        if (tipo == "brazo") return verBrazos;
         return verVigas;   // viga_x, viga_y y cualquier otra
     }
 
@@ -285,6 +302,7 @@ public class VisorEstructura : MonoBehaviour
     {
         if (tipo == "columna") return colorColumna;
         if (tipo == "muro") return colorMuro;
+        if (tipo == "brazo") return colorBrazo;
         return colorViga;
     }
 
@@ -365,17 +383,33 @@ public class VisorEstructura : MonoBehaviour
 
         // vecxz viene en ejes OpenSees (x, y de planta): hay que pasarlo
         // por el mismo swap que las posiciones.
-        Vector3 dir = Vector3.right;
-        if (e.vecxz != null && e.vecxz.Length >= 2)
+        // La direccion del muro en planta viene DADA desde Python en
+        // 'dir_largo'. Antes se deducia de vecxz, y estaba mal: en un
+        // muro vecxz es la NORMAL al muro (es lo que pone la inercia
+        // fuerte donde corresponde), no su direccion. El resultado era
+        // que TODOS los muros se dibujaban girados 90 grados: los del
+        // nucleo de ascensores atravesados y el de fachada metido
+        // dentro del edificio.
+        //
+        // Si el JSON no trae dir_largo (modelos viejos), se cae al
+        // comportamiento anterior para no dejar de dibujar nada.
+        Vector3 alLargo = Vector3.right;
+        if (e.dir_largo != null && e.dir_largo.Length >= 2)
+        {
+            Vector3 d = Ejes.AUnity(e.dir_largo[0], e.dir_largo[1], 0f);
+            if (d.sqrMagnitude > 1e-8f) alLargo = d.normalized;
+        }
+        else if (e.vecxz != null && e.vecxz.Length >= 2)
         {
             Vector3 d = Ejes.AUnity(e.vecxz[0], e.vecxz[1], 0f);
-            if (d.sqrMagnitude > 1e-8f) dir = d.normalized;
+            // El comportamiento viejo suponia vecxz A LO LARGO del muro.
+            if (d.sqrMagnitude > 1e-8f) alLargo = d.normalized;
         }
 
         // El cubo queda: X = largo del muro, Y = alto de piso,
-        // Z = espesor. Rotarlo para que su X apunte a lo largo del muro.
+        // Z = espesor. Se rota para que su X corra a lo largo del muro.
         caja.transform.rotation = Quaternion.LookRotation(
-            Vector3.Cross(dir, Vector3.up).normalized, Vector3.up);
+            Vector3.Cross(Vector3.up, alLargo).normalized, Vector3.up);
         caja.transform.localScale = new Vector3(
             Mathf.Max(e.largo, 0.05f), alto, Mathf.Max(e.espesor, 0.05f));
 

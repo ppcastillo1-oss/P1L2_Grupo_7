@@ -1,6 +1,10 @@
 # AGENTS.md — reglas para agentes de IA en este repo
 
-Laboratorio estructural digital 3D del Edificio de Ingeniería (UANDES).
+Laboratorio estructural digital 3D del edificio **LT2**, armado desde sus
+planos de calculo `2024_22`. El modelo de la estructura vive en el repo
+`A1P1.0_Grupo_7` y este laboratorio lo importa (ver el encabezado de
+`src/modelo_edificio.py`); aca esta el laboratorio: notebook, las 5
+verificaciones, el contrato JSON, el visor de Unity y el servidor.
 Grupo 7. Semana 2.
 
 ## Units

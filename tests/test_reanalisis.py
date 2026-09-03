@@ -7,7 +7,7 @@ POR QUE EXISTE
 Cuando se modifica el modelo desde Unity (mover un nodo, cambiar una
 seccion, borrar una barra) el reanalisis lo hace el servidor Flask, que
 reconstruye el modelo A PARTIR DEL JSON. Si el JSON no describe
-exactamente el mismo problema que resolvio modelo_edificio.py, el
+exactamente el mismo problema que resolvio modelo_lt2.py, el
 servidor devuelve numeros distintos a los del informe y NADIE SE ENTERA:
 no hay error, solo resultados un poco distintos.
 
@@ -129,10 +129,12 @@ try:
             if e > peor:
                 peor, cual = e, (d['id'], k)
 
-    check(comparados > 500, "se comparan todos los nodos",
+    # El LT2 tiene 252 nodos (la grilla vieja tenia 656): el tope solo
+    # esta para que el test no pase con una respuesta vacia.
+    check(comparados > 200, "se comparan todos los nodos",
           f"{comparados} nodos comparados")
     check(peor < TOL,
-          "el reanalisis da los mismos desplazamientos que modelo_edificio.py",
+          "el reanalisis da los mismos desplazamientos que modelo_lt2.py",
           f"peor diferencia {peor:.3e} m en {cual}")
 
     # Un chequeo de orden de magnitud, por si algun dia el JSON

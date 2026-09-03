@@ -3,356 +3,56 @@ r"""
 ================================================================
  exportar_unity.py  -  CONTRATO JSON  OpenSees -> Unity
 ================================================================
- Corre el modelo, resuelve el caso G y escribe modelo_unity.json.
+ Corre el modelo, resuelve el caso G y escribe
+ data/modelo_unity.json, que es lo que lee el visor.
 
  REGLA DE ORO: OpenSees calcula, el JSON es la fuente de verdad,
- Unity solo MUESTRA. Por eso aqui se exporta TODO lo que Unity
- necesita mostrar ya calculado:
+ Unity solo MUESTRA. Por eso el JSON no lleva la geometria a secas:
+ lleva ya calculado todo lo que Unity necesita dibujar --nodos con
+ sus restricciones por GDL, elementos con su seccion, EJES LOCALES,
+ diafragmas, areas tributarias como poligonos y el caso de carga
+ completo.
 
-   - nodos, con sus restricciones por GDL (no un booleano "apoyo");
-   - elementos, con su tipo y su seccion;
-   - EJES LOCALES de cada elemento, calculados en Python.
-     Unity NO debe deducirlos: la orientacion depende de vecxz y de
-     la convencion de OpenSees, y adivinarla en C# es justo el tipo
-     de duplicacion que termina divergiendo del modelo real;
-   - DIAFRAGMAS (maestro + esclavos);
-   - AREAS TRIBUTARIAS como POLIGONOS, con su area y la carga que
-     transfieren. Es lo que alimenta el Tributary Area Inspector y
-     lo que permite contestar "cuantos kN de losa llegan a esta
-     viga" senalandola.
+ ----------------------------------------------------------------
+ POR QUE ESTE ARCHIVO ES UN ENVOLTORIO
+ ----------------------------------------------------------------
+ La estructura del laboratorio es ahora el edificio LT2, cuyo modelo
+ vive en el repo `A1P1.0_Grupo_7` (ver el encabezado de
+ `modelo_edificio.py`). El exportador tambien: es el que sabe que
+ campos pide el C# y con que convencion, y duplicarlo aca seria
+ tener dos contratos que van a divergir.
 
- Unidades: m, kN. Coordenadas en ejes OpenSees (Z vertical); el
- swap a Y-vertical lo hace Unity en CoordinateMap/Ejes.
+ Asi que este archivo hace una sola cosa: llamar al exportador del
+ LT2 y pedirle que escriba en el `data/` de ESTE repo, que es donde
+ el visor y los tests del laboratorio lo buscan.
 
  Correr:  python src/exportar_unity.py
 ================================================================
 """
-import json
-import math
+from __future__ import annotations
+
 import os
 import sys
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+_AQUI = os.path.dirname(os.path.abspath(__file__))
+_RAIZ = os.path.dirname(_AQUI)
 
-import openseespy.opensees as ops        # noqa: E402
+sys.path.insert(0, _AQUI)
 
-import areas_tributarias as at           # noqa: E402
-import modelo_edificio as M              # noqa: E402
+import modelo_edificio as M                # noqa: E402  (resuelve LT2_SRC)
 
-_RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, M.LT2_SRC)
 
+import exportar_unity as _exportador_lt2   # noqa: E402
 
-# ============================================================
-def ejes_locales(pi, pj, vecxz):
-    r"""
-    Calcula los tres versores locales de una barra, con la MISMA
-    convencion que usa OpenSees en geomTransf:
-
-        local_x = (j - i) normalizado
-        local_z = componente de vecxz perpendicular a local_x
-        local_y = local_z  x  local_x
-
-    Se exporta para que Unity los DIBUJE, no los adivine.
-    """
-    dx = [pj[k] - pi[k] for k in range(3)]
-    L = math.sqrt(sum(c * c for c in dx))
-    if L < 1e-12:
-        raise ValueError("barra de largo cero")
-    ex = [c / L for c in dx]
-
-    dot = sum(vecxz[k] * ex[k] for k in range(3))
-    ez = [vecxz[k] - dot * ex[k] for k in range(3)]
-    nz = math.sqrt(sum(c * c for c in ez))
-    if nz < 1e-9:
-        raise ValueError("vecxz es paralelo al eje del elemento")
-    ez = [c / nz for c in ez]
-
-    ey = [ez[1] * ex[2] - ez[2] * ex[1],
-          ez[2] * ex[0] - ez[0] * ex[2],
-          ez[0] * ex[1] - ez[1] * ex[0]]
-
-    return ex, ey, ez
+SALIDA = os.path.join(_RAIZ, 'data', 'modelo_unity.json')
 
 
-def r6(v):
-    return [round(float(c), 6) for c in v]
-
-
-# ============================================================
 def main():
-    print("Construyendo el modelo ...")
-    topo = M.construir_modelo()
-    coords = topo['coords']
-
-    M.nuevo_patron()
-    carga_G = M.aplicar_carga_gravitacional(topo, M.Q_G, incluir_peso_propio=True)
-    ok = M.resolver()
-    if ok != 0:
-        print("El analisis NO convergio")
-        return 1
-    print(f"  caso G resuelto. Carga total {carga_G:.2f} kN")
-
-    sumRz = sum(ops.nodeReaction(n, 3) for n in topo['apoyos'])
-    print(f"  equilibrio: aplicada {carga_G:.4f} = reacciones {sumRz:.4f} "
-          f"(error {abs(carga_G - sumRz):.2e})")
-
-    apoyos = set(topo['apoyos'])
-
-    # ---------- Nodos ----------
-    nodos = []
-    for n in sorted(coords):
-        x, y, z = coords[n]
-        d = ops.nodeDisp(n)
-        es_apoyo = n in apoyos
-        nodos.append({
-            'id': n,
-            'x': round(x, 4), 'y': round(y, 4), 'z': round(z, 4),
-            'fijo': es_apoyo,
-            'restricciones': [1, 1, 1, 1, 1, 1] if es_apoyo else [0] * 6,
-            'auxiliar': False,
-            'ux': round(d[0], 9), 'uy': round(d[1], 9), 'uz': round(d[2], 9),
-        })
-
-    # ---------- Elementos + ejes locales ----------
-    VEC_VERTICAL = (1.0, 0.0, 0.0)
-    VEC_HORIZONTAL = (0.0, 0.0, 1.0)
-    elementos = []
-
-    def agregar(tag, ni, nj, tipo, seccion, vecxz, largo=0.0, espesor=0.0):
-        ex, ey, ez = ejes_locales(coords[ni], coords[nj], vecxz)
-        elementos.append({
-            'id': tag, 'n1': ni, 'n2': nj,
-            'tipo': tipo, 'seccion': seccion,
-            'vecxz': r6(vecxz),
-            'localX': r6(ex), 'localY': r6(ey), 'localZ': r6(ez),
-            # Solo para muros: su tamano REAL en planta. La barra
-            # equivalente vive en el eje baricentrico, asi que sin estos
-            # dos numeros Unity la dibujaria como una columna delgada y
-            # no se podria juzgar si el muro esta donde dice el plano.
-            'largo': round(float(largo), 4),
-            'espesor': round(float(espesor), 4),
-        })
-
-    for (tag, ni, nj) in topo['columnas']:
-        agregar(tag, ni, nj, 'columna', M.SEC_COLUMNA, VEC_VERTICAL)
-    for (tag, ni, nj, lev, ix, iy) in topo['vigas_x']:
-        agregar(tag, ni, nj, 'viga_x', M.SEC_VIGA_X, VEC_HORIZONTAL)
-    for (tag, ni, nj, lev, ix, iy) in topo['vigas_y']:
-        agregar(tag, ni, nj, 'viga_y', M.SEC_VIGA_Y, VEC_HORIZONTAL)
-    for m in topo['muros']:
-        dx, dy = m['dir']
-        agregar(m['tag'], m['ni'], m['nj'], 'muro',
-                f"MURO_{m['muro_id']}", (dx, dy, 0.0),
-                largo=m['largo'], espesor=m['espesor'])
-
-    # ---------- Secciones ----------
-    # Se exportan tambien b y h (las dimensiones REALES en metros) para
-    # que Unity pueda dibujar el perfil de cada barra en vez de un
-    # cilindro generico. Sin esto no se puede ver que una viga es
-    # 30x80 y otra 30x60, que es justo lo que se revisa a ojo.
-    #
-    # CONVENCION DE Iy/Iz EN EL CONTRATO
-    # Los valores van en EJES DE LA SECCION, no en los huecos que espera
-    # ops.element(). Quien construya el modelo aplica el cruce que
-    # corresponda segun la geometria del elemento:
-    #
-    #   elemento horizontal (vecxz = 0,0,1) -> Iy_slot = sec.Iz  (gravedad)
-    #   elemento vertical   (vecxz = 1,0,0) -> Iy_slot = sec.Iy
-    #
-    # Por eso una VIGA exporta Iz = I_gravedad. Exportarlo ya cruzado
-    # hacia que el servidor de reanalisis lo cruzara UNA SEGUNDA VEZ y
-    # resolviera con la inercia equivocada: daba 12.17 mm donde Python
-    # daba 11.78 mm, sin ningun error visible.
-    # Da igual si es viga o columna: en ambos casos la inercia que
-    # termina resistiendo la gravedad es 'Iz' del contrato. Para la
-    # viga porque el consumidor la cruza; para la columna porque su
-    # Iz ya ocupa el hueco Iz. Coincide con como las arma
-    # modelo_edificio._agregar_barra().
-    secciones = []
-    for nombre, s in M.SECCIONES.items():
-        secciones.append({
-            'nombre': nombre, 'A': round(s['A'], 6),
-            'Iy': round(s['I_lat'], 9),
-            'Iz': round(s['I_grav'], 9),
-            'J': round(s['J'], 9),
-            'b': round(s['b'], 4), 'h': round(s['h'], 4),
-        })
-
-    # Cada muro tiene su propia seccion (largo x espesor distintos).
-    for m in topo['muros']:
-        nombre = f"MURO_{m['muro_id']}"
-        if any(x['nombre'] == nombre for x in secciones):
-            continue
-        sm = M.seccion_muro(m['largo'], m['espesor'])
-        secciones.append({
-            'nombre': nombre, 'A': round(sm['A'], 6),
-            'Iy': round(sm['I_fuerte'], 9), 'Iz': round(sm['I_debil'], 9),
-            'J': round(sm['J'], 9),
-            'b': round(m['largo'], 4), 'h': round(m['espesor'], 4),
-        })
-
-    # ---------- Diafragmas ----------
-    diafragmas = [{'nodo_maestro': m, 'nodos': e, 'perpendicular': 3}
-                  for (m, e) in topo['diafragmas']]
-
-    # ---------- Areas tributarias (poligonos) ----------
-    # Se exporta el poligono de cada viga de un piso tipo, junto con
-    # el area y la carga que transfiere. Unity los dibuja tal cual.
-    trib = M.tributarias_por_viga()
-    tributarias = []
-    for (tag, ni, nj, lev, ix, iy) in topo['vigas_x'] + topo['vigas_y']:
-        tipo = 'X' if (tag, ni, nj, lev, ix, iy) in topo['vigas_x'] else 'Y'
-        reg = trib[(tipo, ix, iy)]
-        w = at.carga_lineal(M.Q_G, reg['area'], reg['luz'])
-
-        # Los poligonos van CONCATENADOS en 'vertices' (JsonUtility de
-        # Unity no lee listas de listas), y 'tamanos' dice cuantos
-        # vertices tiene cada uno.
-        #
-        # OJO: no se puede asumir que todos midan lo mismo. Una viga
-        # interior suele tomar un TRAPECIO de un pano (4 vertices) y un
-        # TRIANGULO del otro (3): 7 en total. Repartirlos como 7/2 = 3
-        # mezcla vertices de un poligono con los del otro y dibuja
-        # lineas que no existen.
-        poli = []
-        tamanos = []
-        for p in reg['poligonos']:
-            tamanos.append(len(p))
-            for (px, py) in p:
-                poli.append({'x': round(px, 4), 'y': round(py, 4)})
-
-        tributarias.append({
-            'elemento': tag,
-            'nivel': lev,
-            'area': round(reg['area'], 6),
-            'luz': round(reg['luz'], 4),
-            'qG': M.Q_G,
-            'carga_total': round(M.Q_G * reg['area'], 4),
-            'w': round(w, 6),
-            'z': round(M.NIVELES_Z[lev], 4),
-            'vertices': poli,
-            'tamanos': tamanos,
-            'n_poligonos': len(reg['poligonos']),
-        })
-
-    # ---------- Caso de carga G ----------
-    # OJO: tiene que ser el caso COMPLETO, el mismo que resolvio Python.
-    # Si aca solo se exportara la carga de losa, el servidor de
-    # reanalisis resolveria un problema DISTINTO al del informe y nadie
-    # se enteraria: daria numeros parecidos pero mas chicos (sin peso
-    # propio, 10.04 mm en vez de 11.78 mm). Al final se verifica que la
-    # suma exportada calce con la que se aplico de verdad.
-    cargas_dist = []
-    cargas_nodales = []
-    total_exportado = 0.0
-
-    def viga_con_peso(lista, clave, nombre_sec):
-        """Carga de losa (tributaria) + peso propio de la viga."""
-        nonlocal total_exportado
-        s = M.SECCIONES[nombre_sec]
-        w_propio = M.GAMMA * s['A']
-        for (tag, ni, nj, lev, ix, iy) in lista:
-            reg = trib[(clave, ix, iy)]
-            w = at.carga_lineal(M.Q_G, reg['area'], reg['luz']) + w_propio
-            cargas_dist.append({'elemento': tag, 'wy': 0.0,
-                                'wz': round(-w, 6), 'wx': 0.0})
-            L = math.dist(coords[ni], coords[nj])
-            total_exportado += w * L
-
-    viga_con_peso(topo['vigas_x'], 'X', M.SEC_VIGA_X)
-    viga_con_peso(topo['vigas_y'], 'Y', M.SEC_VIGA_Y)
-
-    # Peso propio de columnas y muros: nodal, mitad en cada extremo.
-    acum = {}
-
-    def nodal(n, fz):
-        acum[n] = acum.get(n, 0.0) + fz
-
-    sc = M.SECCIONES[M.SEC_COLUMNA]
-    for (tag, ni, nj) in topo['columnas']:
-        L = abs(coords[nj][2] - coords[ni][2])
-        W = M.GAMMA * sc['A'] * L
-        nodal(ni, -W / 2.0)
-        nodal(nj, -W / 2.0)
-        total_exportado += W
-
-    for m in topo['muros']:
-        L = abs(coords[m['nj']][2] - coords[m['ni']][2])
-        W = M.GAMMA * m['A'] * L
-        nodal(m['ni'], -W / 2.0)
-        nodal(m['nj'], -W / 2.0)
-        total_exportado += W
-
-    for n, fz in sorted(acum.items()):
-        cargas_nodales.append({'nodo': n, 'fx': 0.0, 'fy': 0.0,
-                               'fz': round(fz, 6),
-                               'mx': 0.0, 'my': 0.0, 'mz': 0.0})
-
-    err_carga = abs(total_exportado - carga_G)
-    print(f"  caso G exportado: {total_exportado:.4f} kN "
-          f"(aplicado {carga_G:.4f}, error {err_carga:.3e})")
-    if err_carga > 1e-6:
-        raise RuntimeError(
-            f"El caso G exportado ({total_exportado:.4f} kN) no coincide con "
-            f"el que se resolvio ({carga_G:.4f} kN). Quien reanalice desde "
-            f"Unity obtendria otros resultados.")
-
-    modelo = {
-        'info': {
-            'descripcion': 'Edificio de Ingenieria UANDES - Semana 2',
-            'unidades': 'm, kN, kPa',
-            'caso_precalculado': 'G',
-            'nota': ('Ejes locales calculados en Python (OpenSees manda). '
-                     'Areas tributarias por bisectrices a 45 grados.'),
-        },
-        'material': {'fpc_MPa': M.FPC, 'poisson': M.POISSON, 'gamma': M.GAMMA},
-        'secciones': secciones,
-        'nodos': nodos,
-        'elementos': elementos,
-        'diafragmas': diafragmas,
-        'brazos_rigidos': [],
-        'areas_tributarias': tributarias,
-        'casos_de_carga': [{
-            'nombre': 'G',
-            'descripcion': ('Peso propio + losa + terminaciones. Caso COMPLETO: '
-                            'reanalizarlo reproduce el mismo resultado que '
-                            'reporta el informe.'),
-            'cargas_nodales': cargas_nodales,
-            'cargas_distribuidas': cargas_dist,
-        }],
-        'resumen': {
-            'n_nodos': len(nodos),
-            'n_elementos': len(elementos),
-            'n_columnas': len(topo['columnas']),
-            'n_vigas': len(topo['vigas_x']) + len(topo['vigas_y']),
-            'n_muros': len(topo['muros']),
-            'n_apoyos': len(topo['apoyos']),
-            'n_diafragmas': len(topo['diafragmas']),
-            'area_planta_m2': round(M.AREA_PLANTA, 4),
-            'qG_kNm2': M.Q_G,
-            'carga_losa_por_piso_kN': round(M.Q_G * M.AREA_PLANTA, 4),
-            'carga_total_G_kN': round(carga_G, 4),
-            'suma_reacciones_kN': round(sumRz, 4),
-            'error_equilibrio_kN': round(abs(carga_G - sumRz), 12),
-        },
-    }
-
-    salida = os.path.join(_RAIZ, 'data', 'modelo_unity.json')
-    with open(salida, 'w', encoding='utf-8') as f:
-        json.dump(modelo, f, indent=1, ensure_ascii=False)
-    print(f"\nEscrito {salida}")
-    print(f"  {len(nodos)} nodos | {len(elementos)} elementos | "
-          f"{len(tributarias)} areas tributarias")
-
-    # Copia a StreamingAssets para que Unity lo lea directo.
-    destino = os.path.join(_RAIZ, 'unity', 'Assets', 'StreamingAssets',
-                           'modelo_unity.json')
-    if os.path.isdir(os.path.dirname(destino)):
-        with open(destino, 'w', encoding='utf-8') as f:
-            json.dump(modelo, f, indent=1, ensure_ascii=False)
-        print(f"  copiado a {destino}")
-
-    return 0
+    print('Estructura: edificio LT2 (planos de calculo 2024_22)')
+    print('Exportador: %s' % os.path.join(M.LT2_SRC, 'exportar_unity.py'))
+    print()
+    return _exportador_lt2.main(SALIDA)
 
 
 if __name__ == '__main__':

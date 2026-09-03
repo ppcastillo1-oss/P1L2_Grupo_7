@@ -1,544 +1,616 @@
 # -*- coding: utf-8 -*-
 r"""
 ================================================================
- modelo_edificio.py  -  FUENTE DE VERDAD DEL EDIFICIO
+ modelo_edificio.py  -  LA ESTRUCTURA DEL LABORATORIO
 ================================================================
- Geometria, materiales, secciones, muros, apoyos, diafragmas y
- cargas del Edificio de Ingenieria. Todos los demas scripts
- IMPORTAN de aqui; si hay que cambiar el modelo, se cambia SOLO
- en este archivo.
+ Este modulo es la FUENTE DE VERDAD del modelo para todo el
+ laboratorio: el notebook, verificar_lab2.py y exportar_unity.py
+ importan de aca y de ningun otro lado.
 
  Unidades: m, kN, kPa (consistentes).
 
  ----------------------------------------------------------------
- QUE CAMBIA RESPECTO DE LA SEMANA 1
+ QUE CAMBIO
  ----------------------------------------------------------------
- 1. AREAS TRIBUTARIAS a 45 grados (modulo areas_tributarias.py) en
-    vez del reparto 50/50. En los panos alargados de este edificio
-    el 50/50 descargaba la viga larga un 40%.
+ Hasta la Semana 2 la estructura era el Edificio de Ingenieria
+ idealizado como una GRILLA REGULAR: 8 ejes en X por 6 en Y por 9
+ niveles, con una columna en cada cruce y una viga en cada tramo de
+ eje. Toda la geometria cabia en tres listas de numeros.
 
- 2. CARGAS DISTRIBUIDAS sobre las vigas con eleLoad, en vez de
-    cargas puntuales en los nodos. La losa descarga a lo largo de la
-    viga, no en sus extremos; ademas asi la viga tiene momento de
-    vano y no solo de nudo.
+ Ahora la estructura es el edificio **LT2**, armado entero desde sus
+ planos de calculo `2024_22`. Y no es una grilla:
 
- 3. DIAFRAGMA RIGIDO con ops.rigidDiaphragm en vez de equalDOF.
-    equalDOF(m, s, 1, 2, 6) obliga a que TODOS los nodos del piso
-    tengan el mismo ux, uy y rz -- eso no es un diafragma rigido,
-    es un piso que no puede rotar. El diafragma real cumple:
-        ux_i = ux_m - rz*(y_i - y_m)
-        uy_i = uy_m + rz*(x_i - x_m)
-    o sea, permite ROTACION del piso. Con planta irregular y sismo
-    la diferencia importa.
+   - 8 pilares y 9 muros repartidos sin simetria;
+   - las vigas no siguen los ejes: se cruzan entre ellas;
+   - hay una caja de ascensores, un vano de fachada y esquinas en T;
+   - la planta no es un rectangulo lleno.
 
- 4. MUROS equivalentes ("columna ancha") como elementos lineales
-    verticales, orientados con vecxz.
+ Por eso el modelo del LT2 no es "una grilla con otros numeros": es
+ un pipeline propio (leer el DXF -> emparejar caras -> mallar ->
+ encontrar los panos), que vive en el repo `A1P1.0_Grupo_7`.
 
- 5. TORSION J por Saint-Venant en vez de min(Iy,Iz)*0.3, que no
-    corresponde a ninguna formula y subestimaba J unas 5 veces.
+ ----------------------------------------------------------------
+ POR QUE UN ADAPTADOR Y NO UNA COPIA
+ ----------------------------------------------------------------
+ Este archivo NO reimplementa el LT2: lo IMPORTA y le pone encima la
+ misma interfaz que el laboratorio ya usaba. Asi hay UNA sola copia
+ del modelo. La alternativa --copiar `modelo_lt2.py`, `malla.py`,
+ `panos.py` y el ingestor aca-- daria un lab autocontenido, pero dos
+ copias de un modelo que sigue cambiando: divergen a la semana y
+ despues nadie sabe cual es la buena.
+
+ Lo que el laboratorio conserva sin cambios: el notebook y sus
+ secciones, las 5 verificaciones, el contrato JSON, el visor de
+ Unity, el servidor de reanalisis y los tests.
+
+ ----------------------------------------------------------------
+ LO QUE NO SE PUDO CONSERVAR, Y POR QUE
+ ----------------------------------------------------------------
+ `id_nodo(nivel, ix, iy)` no existe mas. En una grilla cada nodo es
+ el cruce del eje ix con el eje iy, asi que un nodo tiene direccion.
+ En el LT2 los nodos salen de MALLAR las vigas: 46 nodos por piso en
+ posiciones que no forman grilla, y el cruce del eje C con el eje 2
+ puede no tener ningun nodo. Inventar un indice (ix, iy) seria
+ mentir sobre la geometria.
+
+ En su lugar: `nodos_del_nivel(nivel)` y `nodo_mas_cercano(x, y, nivel)`.
+
+ `construir_modelo(con_muros=False)` tampoco: en la grilla los muros
+ eran un extra sobre un marco que se sostenia solo. En el LT2 hay 115
+ brazos rigidos que cuelgan de los muros, asi que sacarlos deja
+ vigas flotando y la matriz singular. El experimento de control
+ equivalente es `girar_muros=True`, que gira 90 grados el eje fuerte
+ de todos los muros: un muro tiene hasta 1000 veces mas inercia en un
+ eje que en el otro, asi que si el resultado no cambia al girarlos,
+ los muros no estaban tomando nada.
+
+ Las dos siguen existiendo como funciones, pero solo para levantar un
+ error que EXPLICA como salir de ahi: la causa mas probable de que
+ alguien las llame no es un bug, es una celda vieja de una sesion de
+ Jupyter que quedo abierta.
 ================================================================
 """
+from __future__ import annotations
+
 import json
-import math
 import os
+import sys
 
 import openseespy.opensees as ops
-
-import areas_tributarias as at
 
 _AQUI = os.path.dirname(os.path.abspath(__file__))
 _RAIZ = os.path.dirname(_AQUI)
 
 
 # ============================================================
-# 1. GEOMETRIA  (extraida de los planos DXF, en metros)
+# 0. DONDE VIVE EL MODELO DEL LT2
 # ============================================================
-# Ejes estructurales. Vienen de la capa de ejes del DXF (las cotas
-# del plano estan en cm; ya convertidas a m).
-EJES_X = [8.02, 11.32, 14.72, 18.02, 28.02, 38.02, 48.02, 53.02]
-EJES_Y = [46.92, 50.26, 55.20, 60.20, 65.22, 72.75]
+def _ruta_del_lt2():
+    """
+    Encuentra `src/` del repo A1P1.0_Grupo_7, que es donde vive el
+    modelo del LT2.
 
-# Cotas de piso. El nivel 0 es la fundacion (donde van los apoyos).
-NIVELES_Z = [0.0, 4.0, 7.5, 11.0, 14.5, 18.0, 21.5, 25.0, 28.5]
+    Se busca al lado de este repo, que es como estan las dos carpetas.
+    Si se mueve, se declara en la variable de entorno LT2_SRC; asi no
+    hay que editar codigo para reubicarlo.
+    """
+    declarada = os.environ.get('LT2_SRC')
+    candidatas = ([declarada] if declarada else []) + [
+        os.path.join(os.path.dirname(_RAIZ), 'A1P1.0_Grupo_7', 'src'),
+        os.path.join(_RAIZ, '..', 'A1P1.0_Grupo_7', 'src'),
+    ]
+    for c in candidatas:
+        if c and os.path.isfile(os.path.join(c, 'modelo_lt2.py')):
+            return os.path.abspath(c)
+    raise RuntimeError(
+        'No encuentro el modelo del LT2 (src/modelo_lt2.py del repo '
+        'A1P1.0_Grupo_7). Se busco en:\n  ' +
+        '\n  '.join(str(c) for c in candidatas) +
+        '\nSi el repo esta en otra parte, declara la ruta con la variable '
+        'de entorno LT2_SRC.')
 
-nX = len(EJES_X)
-nY = len(EJES_Y)
+
+LT2_SRC = _ruta_del_lt2()
+if LT2_SRC not in sys.path:
+    sys.path.insert(0, LT2_SRC)
+
+import modelo_lt2 as _LT2                  # noqa: E402
+import panos as _panos                     # noqa: E402
+
+RUTA_GEOMETRIA = _LT2.GEOMETRIA
+with open(RUTA_GEOMETRIA, encoding='utf-8') as _f:
+    GEOMETRIA = json.load(_f)
+
+
+# ============================================================
+# 1. GEOMETRIA  (toda leida del plano, nada escrito a mano)
+# ============================================================
+# Los ejes son los que rotula el calculista, con su nombre. En la
+# grilla vieja los ejes DEFINIAN la estructura; aca son referencia:
+# sirven para registrar las laminas entre si y para acotar el
+# edificio, pero no hay una columna en cada cruce.
+EJES = {d: [(e['nombre'], e['coord']) for e in GEOMETRIA['ejes'][d]]
+        for d in ('X', 'Y')}
+EJES_X = [c for _n, c in EJES['X']]
+EJES_Y = [c for _n, c in EJES['Y']]
+NOMBRES_X = [n for n, _c in EJES['X']]
+NOMBRES_Y = [n for n, _c in EJES['Y']]
+
+nX, nY = len(EJES_X), len(EJES_Y)
+
+# Los niveles del modelo salen de las 6 elevaciones: una cota es un
+# piso del edificio solo si las SEIS coinciden en ella.
+_NM = GEOMETRIA['niveles_del_modelo']
+NIVELES_Z = [_NM['base']] + [p['z'] for p in _NM['pisos']]
 nNiveles = len(NIVELES_Z)
-NODOS_POR_PISO = nX * nY
+ALTURA = NIVELES_Z[-1] - NIVELES_Z[0]
 
-AREA_PLANTA = (EJES_X[-1] - EJES_X[0]) * (EJES_Y[-1] - EJES_Y[0])
+# La junta de dilatacion: el LT2 termina aca y al otro lado empieza
+# otro cuerpo, estructuralmente separado.
+VENTANA = GEOMETRIA['ventana']
+
+# Un piso "tipo": los cuatro de abajo comparten lamina y carga.
+NIVEL_TIPO = 1
 
 
 # ============================================================
-# 2. MATERIAL  (hormigon armado)
+# 2. MATERIAL Y SECCIONES
 # ============================================================
-FPC = 28.0                                  # MPa
-POISSON = 0.20
-Ec = 4700.0 * math.sqrt(FPC) * 1000.0       # kPa  (ACI 318)
+_HORM = GEOMETRIA['materiales']['hormigon']
+FPC = float(_HORM['fc_MPa'])            # MPa, de la nota de la lamina 100
+POISSON = float(_HORM.get('poisson', 0.20))
+GAMMA = float(_HORM.get('gamma_kN_m3', 25.0))
+Ec = 4700.0 * (FPC ** 0.5) * 1000.0     # kPa
 Gc = Ec / (2.0 * (1.0 + POISSON))
-GAMMA = 25.0                                # kN/m3
 
-
-# ============================================================
-# 3. TORSION DE SECCION RECTANGULAR
-# ============================================================
-def J_rectangular(b, h):
-    r"""
-    Constante de torsion de Saint-Venant para seccion rectangular
-    llena (Timoshenko / Roark):
-
-        J = a*t^3 * [ 1/3 - 0.21*(t/a)*(1 - t^4/(12*a^4)) ]
-
-    con a = lado LARGO y t = lado CORTO.
-
-    NOTA: la version de Semana 1 usaba min(Iy,Iz)*0.3, que no
-    corresponde a ninguna formula y daba ~5.6 veces MENOS rigidez
-    torsional. En un marco simetrico no se nota (torsion ~ 0), pero
-    este edificio tiene planta irregular: los panos van de 3.30 m a
-    10.00 m, asi que la torsion si carga las columnas.
-    """
-    a = max(b, h)
-    t = min(b, h)
-    return a * t**3 * (1.0 / 3.0 - 0.21 * (t / a) * (1.0 - t**4 / (12.0 * a**4)))
-
-
-# ============================================================
-# 4. SECCIONES
-# ============================================================
-# Convencion de nombres: en vez de Iy/Iz (que se confunden al pasarlos
-# a OpenSees) las guardamos por FUNCION:
-#   I_grav    -> flexion que produce desplazamiento VERTICAL (gravedad)
-#   I_lat     -> flexion que produce desplazamiento HORIZONTAL
-# La asignacion a los huecos Iy/Iz de ops.element se hace en
-# _agregar_barra(), que es el unico lugar que conoce la convencion.
-
-def _seccion_rect(nombre, b, h):
-    """
-    Seccion rectangular b (ancho) x h (alto).
-    Para una VIGA horizontal: h es el canto, b el ancho.
-    """
-    return {
-        'nombre': nombre,
-        'b': b, 'h': h,
-        'A': b * h,
-        'I_grav': b * h**3 / 12.0,     # flexion vertical
-        'I_lat': h * b**3 / 12.0,      # flexion lateral
-        'J': J_rectangular(b, h),
-    }
-
-
-SECCIONES = {
-    'C50x50':  _seccion_rect('C50x50', 0.50, 0.50),   # columnas
-    'VX30x60': _seccion_rect('VX30x60', 0.30, 0.60),  # vigas en X
-    'VY30x80': _seccion_rect('VY30x80', 0.30, 0.80),  # vigas en Y
-}
-
-SEC_COLUMNA = 'C50x50'
-SEC_VIGA_X = 'VX30x60'
-SEC_VIGA_Y = 'VY30x80'
-
-
-# ============================================================
-# 5. MUROS  (elementos lineales equivalentes: "columna ancha")
-# ============================================================
-# Se leen de data/muros.json para que la geometria sea TRAZABLE al
-# plano y no quede escondida en el codigo. Si el archivo no existe,
-# el modelo se arma sin muros y lo avisa.
-#
-# Formato de cada muro:
-#   {"id": "M1", "x1":..,"y1":.., "x2":..,"y2":.., "espesor":..,
-#    "desde_nivel":1, "hasta_nivel":8}
-#
-# Idealizacion: el muro se modela como UNA barra vertical en su eje
-# baricentrico, con la seccion del muro completo. Su eje fuerte se
-# orienta con vecxz en la direccion del muro en planta.
-RUTA_MUROS = os.path.join(_RAIZ, 'data', 'muros.json')
-
-
-def cargar_muros():
-    """Lee data/muros.json. Devuelve [] si no existe todavia."""
-    if not os.path.exists(RUTA_MUROS):
-        return []
-    with open(RUTA_MUROS, encoding='utf-8') as f:
-        datos = json.load(f)
-    return datos.get('muros', datos if isinstance(datos, list) else [])
+J_rectangular = _LT2.J_rectangular      # Saint-Venant, la misma del lab
 
 
 def seccion_muro(largo, espesor):
+    """Seccion equivalente de un muro modelado como columna ancha."""
+    return _LT2.seccion('M %.2fx%.2f' % (espesor, largo), espesor, largo)
+
+
+# Las secciones del LT2 no son tres fijas: salen medidas del plano y
+# hay una por cada tamano distinto que aparece. Se llenan al construir
+# el modelo; las tres constantes se conservan para el codigo del lab
+# que las nombra, apuntando a la mas repetida de cada tipo.
+SECCIONES = {}
+SEC_COLUMNA = 'P 0.70x0.70'
+SEC_VIGA_X = 'V 0.60x0.80'
+SEC_VIGA_Y = 'V 0.60x0.80'
+
+
+# ============================================================
+# 3. CARGA DE PISO  (del plano de cargas, lamina 700)
+# ============================================================
+# En la grilla vieja q_G era un numero escrito a mano
+# (25*0.25 + 1.5 = 7.75). Aca sale del PLANO DE CARGAS, y no es un
+# solo numero: la lamina 700 da un peso muerto adicional distinto
+# para las plantas tipo y para el cielo del 4o piso.
+ESPESOR_LOSA = GEOMETRIA['losas']['auditoria']['espesor_dominante']
+_CARGAS = GEOMETRIA['cargas']
+_G_MS2 = _CARGAS['g_ms2']
+PESO_LOSA = GAMMA * ESPESOR_LOSA                     # kN/m2
+
+_POR_LAMINA = _CARGAS['por_lamina']
+_LAMINA_TIPO = _NM['pisos'][0]['lamina']
+_LAMINA_TECHO = _NM['pisos'][-1]['lamina']
+
+TERMINACIONES = (_POR_LAMINA[_LAMINA_TIPO]['peso_muerto_adicional_kgf_m2']
+                 * _G_MS2 / 1000.0)                  # kN/m2
+Q_G = PESO_LOSA + TERMINACIONES                      # kN/m2, planta tipo
+Q_Q = (_POR_LAMINA[_LAMINA_TIPO]['sobrecarga_kgf_m2']
+       * _G_MS2 / 1000.0)                            # kN/m2, sobrecarga
+
+TERMINACIONES_TECHO = (_POR_LAMINA[_LAMINA_TECHO]['peso_muerto_adicional_kgf_m2']
+                       * _G_MS2 / 1000.0)
+Q_G_TECHO = PESO_LOSA + TERMINACIONES_TECHO
+Q_Q_TECHO = (_POR_LAMINA[_LAMINA_TECHO]['sobrecarga_kgf_m2']
+             * _G_MS2 / 1000.0)
+
+
+def carga_de_piso(nivel):
+    """q_G del nivel: el techo tiene su propio peso muerto adicional."""
+    return Q_G_TECHO if nivel == nNiveles - 1 else Q_G
+
+
+# ============================================================
+# 4. LOS MUROS DEL PLANO
+# ============================================================
+def cargar_muros():
     """
-    Seccion equivalente de un muro de largo L y espesor t.
-
-        A       = L * t
-        I_fuerte = t * L^3 / 12     (flexion EN el plano del muro)
-        I_debil  = L * t^3 / 12     (fuera del plano)
-
-    La relacion I_fuerte/I_debil = (L/t)^2, que para un muro de 4 m
-    de largo y 0.20 m de espesor es 400: por eso importa orientarlo
-    bien. Un muro mal orientado aporta 400 veces menos rigidez de la
-    que deberia, y el modelo no avisa.
+    Los muros de la planta tipo, con eje y espesor, tal como los
+    emparejo el ingestor a partir de sus dos caras dibujadas.
     """
-    return {
-        'A': largo * espesor,
-        'I_fuerte': espesor * largo**3 / 12.0,
-        'I_debil': largo * espesor**3 / 12.0,
-        'J': J_rectangular(largo, espesor),
-    }
+    muros = GEOMETRIA['plantas'][_LAMINA_TIPO]['muros']
+    return [dict(m, id=i + 1) for i, m in enumerate(muros)]
+
+
+def cargar_pilares():
+    """Los pilares de la planta tipo, medidos del dibujo."""
+    return GEOMETRIA['plantas'][_LAMINA_TIPO]['pilares']
+
+
+def cargar_vigas():
+    """Las vigas de la planta tipo, con su ancho medido y su alto rotulado."""
+    return GEOMETRIA['plantas'][_LAMINA_TIPO]['vigas']
 
 
 # ============================================================
-# 6. CARGAS
+# 5. AVISO DE CELDA VIEJA
 # ============================================================
-ESPESOR_LOSA = 0.25              # m
-TERMINACIONES = 1.5              # kN/m2
-
-# q_G = peso propio de losa + terminaciones uniformes.
-# El peso propio de vigas y columnas se agrega aparte (no pasa por
-# el reparto tributario: cada barra carga el suyo).
-Q_G = GAMMA * ESPESOR_LOSA + TERMINACIONES     # 7.75 kN/m2
-Q_Q = 2.0                                       # kN/m2 (carga viva)
-
-
-# ============================================================
-# 7. NUMERACION DE NODOS
-# ============================================================
-def id_nodo(nivel, ix, iy):
-    """
-    Id del nodo de la malla. Los ids NO cambian al agregar muros o
-    diafragmas: los nodos extra se numeran despues de estos.
-    """
-    return nivel * NODOS_POR_PISO + ix * nY + iy + 1
-
-
-# Los nodos maestros de diafragma van despues de toda la malla.
-_BASE_MAESTROS = nNiveles * NODOS_POR_PISO
-
-
-def id_maestro(nivel):
-    """Nodo maestro del diafragma del piso `nivel`."""
-    return _BASE_MAESTROS + nivel
+# La causa mas probable de que alguien llame a `id_nodo` o a
+# `construir_modelo(con_muros=False)` no es un error de programacion:
+# es una CELDA VIEJA. El notebook se actualizo con la estructura
+# nueva, pero una sesion de Jupyter que ya estaba abierta sigue
+# teniendo en memoria la version anterior, y ejecutarla daba un error
+# que no decia como salir de ahi.
+_CELDA_VIEJA = (
+    '\n'
+    'Estas ejecutando una celda del laboratorio ANTERIOR (el de la grilla\n'
+    'regular). El notebook en disco ya no usa esta llamada.\n'
+    '\n'
+    'COMO ARREGLARLO: recarga el notebook desde el disco.\n'
+    '   JupyterLab : File -> Reload Notebook from Disk,\n'
+    '                y despues Kernel -> Restart Kernel and Run All Cells\n'
+    '   VS Code    : cerra la pestana del notebook y volve a abrirla\n'
+    '\n'
+)
 
 
 # ============================================================
-# 8. CONSTRUCCION DEL MODELO
+# 6. EL MODELO
 # ============================================================
-# Etiquetas de geomTransf
-TR_VERTICAL = 1        # columnas y muros por defecto: vecxz = (1,0,0)
-TR_HORIZONTAL = 2      # vigas: vecxz = (0,0,1)
-_TR_LIBRE = 10         # de aqui en adelante, transformaciones de muros
-
-# Topologia de la ultima construccion (para exportar y verificar).
+# El modelo del LT2 es un objeto; el laboratorio esperaba funciones de
+# modulo. Se guarda la instancia aca para que las funciones del lab
+# sigan funcionando igual.
+MODELO = None            # la instancia de ModeloLT2 ya ensamblada
 TOPOLOGIA = {}
 
 
-def _agregar_barra(tag, ni, nj, A, I_grav_o_fuerte, I_lat_o_debil, J, transf,
-                   vertical):
-    r"""
-    Crea un elasticBeamColumn cuidando la convencion de ejes locales.
-
-    La firma de OpenSees es:
-        element('elasticBeamColumn', tag, ni, nj, A, E, G, J, Iy, Iz, transf)
-
-    y CUAL inercia va en el hueco Iy depende de la transformacion:
-
-      VIGA horizontal, vecxz = (0,0,1):
-        local x = eje de la viga; local z = vertical.
-        La gravedad flecta en el plano x-z -> momento My.
-        => la inercia de gravedad va en el hueco Iy.
-
-      COLUMNA/MURO vertical, vecxz = (1,0,0):
-        local x = vertical; local z = +X global.
-        El desplazamiento en X corresponde a My.
-        => la inercia del eje fuerte va en el hueco Iy.
-
-    En ambos casos la inercia "principal" va en Iy. Por eso este es el
-    UNICO lugar del proyecto que toca ese orden: en todos los demas se
-    habla de I_grav / I_fuerte, que no se prestan a confusion.
+def construir_modelo(con_diafragmas=True, girar_muros=False, con_muros=None):
     """
-    ops.element('elasticBeamColumn', tag, ni, nj,
-                A, Ec, Gc, J,
-                I_grav_o_fuerte,    # hueco Iy
-                I_lat_o_debil,      # hueco Iz
-                transf)
+    Levanta el modelo completo del LT2 en OpenSees, SIN cargas.
 
+    Devuelve la topologia en el mismo formato que usaba el lab:
+    listas de columnas, vigas_x, vigas_y, muros, brazos, apoyos y
+    diafragmas, cada elemento como (tag, ni, nj).
 
-def construir_modelo(con_muros=True, con_diafragmas=True):
+    Las vigas se separan en X e Y por hacia donde corren en planta,
+    que es lo que el visor colorea y filtra.
     """
-    Levanta el modelo completo en OpenSees desde cero.
+    global MODELO
+    if con_muros is False:
+        raise NotImplementedError(_CELDA_VIEJA + (
+            'Lo que pedia esa celda: construir_modelo(con_muros=False).\n'
+            '\n'
+            'Por que no aplica: en la grilla vieja los muros eran un extra\n'
+            'sobre un marco que se sostenia solo. En el LT2 hay 115 brazos\n'
+            'rigidos que cuelgan de los muros, asi que sacarlos deja vigas\n'
+            'flotando y la matriz sale singular.\n'
+            '\n'
+            'El experimento de control equivalente es girar_muros=True: gira\n'
+            '90 grados el eje fuerte de todos los muros. Un muro tiene hasta\n'
+            '1000 veces mas inercia en un eje que en el otro, asi que si el\n'
+            'resultado no cambia al girarlos, no estaban tomando nada.'))
 
-    Devuelve un dict con la topologia: listas de columnas, vigas,
-    muros, apoyos y diafragmas, cada elemento como (tag, ni, nj).
-    """
-    ops.wipe()
-    ops.model('basic', '-ndm', 3, '-ndf', 6)
+    MODELO = _LT2.ModeloLT2().preparar()
+    MODELO.ensamblar(None, con_diafragmas=con_diafragmas,
+                     girar_muros=girar_muros)
 
-    ops.geomTransf('Linear', TR_VERTICAL, 1.0, 0.0, 0.0)     # verticales
-    ops.geomTransf('Linear', TR_HORIZONTAL, 0.0, 0.0, 1.0)   # horizontales
+    SECCIONES.clear()
+    for _nombre, s in MODELO.secciones.items():
+        SECCIONES[s.nombre] = {'nombre': s.nombre, 'A': s.A, 'Iy': s.Iy,
+                               'Iz': s.Iz, 'J': s.J, 'b': s.b, 'h': s.h}
 
-    # ---------- Nodos de la malla ----------
-    coords = {}
-    for lev in range(nNiveles):
-        z = NIVELES_Z[lev]
-        for ix in range(nX):
-            for iy in range(nY):
-                n = id_nodo(lev, ix, iy)
-                coords[n] = (EJES_X[ix], EJES_Y[iy], z)
-                ops.node(n, EJES_X[ix], EJES_Y[iy], z)
+    columnas, muros = [], []
+    for tag, n1, n2, _sec, _v, tipo, _peso in MODELO.verticales:
+        (muros if tipo == 'muro' else columnas).append((tag, n1, n2))
 
-    # ---------- Apoyos: empotramiento en la fundacion ----------
-    apoyos = []
-    for ix in range(nX):
-        for iy in range(nY):
-            n = id_nodo(0, ix, iy)
-            ops.fix(n, 1, 1, 1, 1, 1, 1)
-            apoyos.append(n)
+    vigas_x, vigas_y = [], []
+    for tag, n1, n2, _sec, _L, _peso, _k in MODELO.vigas:
+        a, b = MODELO.nodos[n1], MODELO.nodos[n2]
+        destino = vigas_x if abs(b[0] - a[0]) >= abs(b[1] - a[1]) else vigas_y
+        destino.append((tag, n1, n2))
 
-    tag = 1
-    columnas, vigas_x, vigas_y, muros = [], [], [], []
-
-    # ---------- Columnas ----------
-    sc = SECCIONES[SEC_COLUMNA]
-    for lev in range(nNiveles - 1):
-        for ix in range(nX):
-            for iy in range(nY):
-                ni = id_nodo(lev, ix, iy)
-                nj = id_nodo(lev + 1, ix, iy)
-                _agregar_barra(tag, ni, nj, sc['A'], sc['I_lat'], sc['I_grav'],
-                               sc['J'], TR_VERTICAL, vertical=True)
-                columnas.append((tag, ni, nj))
-                tag += 1
-
-    # ---------- Vigas en X ----------
-    sx = SECCIONES[SEC_VIGA_X]
-    for lev in range(1, nNiveles):
-        for ix in range(nX - 1):
-            for iy in range(nY):
-                ni = id_nodo(lev, ix, iy)
-                nj = id_nodo(lev, ix + 1, iy)
-                _agregar_barra(tag, ni, nj, sx['A'], sx['I_grav'], sx['I_lat'],
-                               sx['J'], TR_HORIZONTAL, vertical=False)
-                vigas_x.append((tag, ni, nj, lev, ix, iy))
-                tag += 1
-
-    # ---------- Vigas en Y ----------
-    sy = SECCIONES[SEC_VIGA_Y]
-    for lev in range(1, nNiveles):
-        for ix in range(nX):
-            for iy in range(nY - 1):
-                ni = id_nodo(lev, ix, iy)
-                nj = id_nodo(lev, ix, iy + 1)
-                _agregar_barra(tag, ni, nj, sy['A'], sy['I_grav'], sy['I_lat'],
-                               sy['J'], TR_HORIZONTAL, vertical=False)
-                vigas_y.append((tag, ni, nj, lev, ix, iy))
-                tag += 1
-
-    # ---------- Muros equivalentes ----------
-    datos_muros = cargar_muros() if con_muros else []
-    transf_muro = _TR_LIBRE
-    nodo_extra = _BASE_MAESTROS + nNiveles + 1
-    # Nodos de muro por nivel: se suman al diafragma de su piso, que es
-    # lo que conecta el muro con el resto de la estructura. Sin esto el
-    # muro queda como un voladizo suelto al lado del edificio: aporta
-    # rigidez a nada y el modelo no avisa.
-    nodos_muro_por_nivel = {lev: [] for lev in range(nNiveles)}
-
-    for m in datos_muros:
-        x1, y1 = float(m['x1']), float(m['y1'])
-        x2, y2 = float(m['x2']), float(m['y2'])
-        largo = math.hypot(x2 - x1, y2 - y1)
-        if largo < 1e-6:
-            raise ValueError(f"Muro {m.get('id')} tiene largo cero")
-
-        espesor = float(m['espesor'])
-        sm = seccion_muro(largo, espesor)
-
-        # Eje baricentrico del muro y direccion en planta.
-        xc, yc = (x1 + x2) / 2.0, (y1 + y2) / 2.0
-        dx, dy = (x2 - x1) / largo, (y2 - y1) / largo
-
-        # El eje FUERTE del muro esta en su plano: vecxz apunta en la
-        # direccion del muro en planta. Nunca puede ser paralelo al eje
-        # del elemento (que es vertical), asi que es seguro.
-        ops.geomTransf('Linear', transf_muro, dx, dy, 0.0)
-
-        desde = int(m.get('desde_nivel', 1))
-        hasta = int(m.get('hasta_nivel', nNiveles - 1))
-
-        prev = None
-        for lev in range(desde - 1, hasta + 1):
-            n = nodo_extra
-            nodo_extra += 1
-            coords[n] = (xc, yc, NIVELES_Z[lev])
-            ops.node(n, xc, yc, NIVELES_Z[lev])
-            if lev == 0:
-                ops.fix(n, 1, 1, 1, 1, 1, 1)
-                apoyos.append(n)
-            else:
-                nodos_muro_por_nivel[lev].append(n)
-            if prev is not None:
-                _agregar_barra(tag, prev, n, sm['A'], sm['I_fuerte'],
-                               sm['I_debil'], sm['J'], transf_muro,
-                               vertical=True)
-                muros.append({
-                    'tag': tag, 'ni': prev, 'nj': n,
-                    'muro_id': m.get('id'), 'nivel': lev,
-                    'A': sm['A'], 'largo': largo, 'espesor': espesor,
-                    'dir': (dx, dy),
-                })
-                tag += 1
-            prev = n
-        transf_muro += 1
-
-    # ---------- Diafragmas rigidos ----------
-    diafragmas = []
-    if con_diafragmas:
-        for lev in range(1, nNiveles):
-            maestro = id_maestro(lev)
-            xm = sum(EJES_X) / nX
-            ym = sum(EJES_Y) / nY
-            coords[maestro] = (xm, ym, NIVELES_Z[lev])
-            ops.node(maestro, xm, ym, NIVELES_Z[lev])
-
-            # El diafragma solo liga ux, uy y rz. Los GDL fuera de su
-            # plano (uz, rx, ry) del MAESTRO quedarian sin rigidez y la
-            # matriz saldria singular: hay que restringirlos.
-            ops.fix(maestro, 0, 0, 1, 1, 1, 0)
-
-            esclavos = [id_nodo(lev, ix, iy)
-                        for ix in range(nX) for iy in range(nY)]
-            # Los nodos de muro de este piso entran al MISMO diafragma:
-            # asi el muro trabaja junto con el marco en vez de quedar
-            # aislado.
-            esclavos += nodos_muro_por_nivel.get(lev, [])
-            # perpendicular = 3 -> diafragma horizontal (plano X-Y)
-            ops.rigidDiaphragm(3, maestro, *esclavos)
-            diafragmas.append((maestro, esclavos))
+    brazos = [(tag, n1, n2) for tag, n1, n2, _s, _L, _k in MODELO.brazos]
 
     TOPOLOGIA.clear()
     TOPOLOGIA.update({
-        'coords': coords,
+        'coords': dict(MODELO.nodos),
         'columnas': columnas,
         'vigas_x': vigas_x,
         'vigas_y': vigas_y,
         'muros': muros,
-        'apoyos': apoyos,
-        'diafragmas': diafragmas,
-        'n_elementos': tag - 1,
+        'brazos': brazos,
+        'apoyos': list(MODELO.nodos_base),
+        'diafragmas': [(m, nodos_del_nivel(k))
+                       for k, m in sorted(MODELO.maestros.items())],
+        'n_elementos': (len(columnas) + len(vigas_x) + len(vigas_y)
+                        + len(muros) + len(brazos)),
     })
     return TOPOLOGIA
 
 
-# ============================================================
-# 9. CARGAS POR AREAS TRIBUTARIAS
-# ============================================================
-def tributarias_por_viga():
-    """
-    Calcula el area tributaria de cada viga de un piso tipo y la
-    devuelve indexada por la clave de malla ('X'|'Y', ix, iy).
-
-    Es el MISMO reparto para todos los pisos, porque la planta no
-    cambia con la altura.
-    """
-    return at.repartir_piso(EJES_X, EJES_Y)
-
-
-def aplicar_carga_gravitacional(topo, q, incluir_peso_propio=True):
-    r"""
-    Aplica la carga de piso q [kN/m2] a las vigas como carga
-    DISTRIBUIDA, usando las areas tributarias a 45 grados.
-
-        w_viga = q * A_tributaria / L        [kN/m]
-
-    y en OpenSees:
-        eleLoad('-ele', tag, '-type', '-beamUniform', Wy, Wz, Wx)
-
-    Con vecxz = (0,0,1) el eje local z de la viga es el vertical, asi
-    que la gravedad va en Wz (el SEGUNDO valor) y con signo negativo.
-
-    Devuelve la carga total aplicada [kN], para poder verificar
-    conservacion y equilibrio despues.
-    """
-    trib = tributarias_por_viga()
-    total = 0.0
-
-    for (tag, ni, nj, lev, ix, iy) in topo['vigas_x']:
-        reg = trib[('X', ix, iy)]
-        w = at.carga_lineal(q, reg['area'], reg['luz'])
-        ops.eleLoad('-ele', tag, '-type', '-beamUniform', 0.0, -w, 0.0)
-        total += w * reg['luz']
-
-    for (tag, ni, nj, lev, ix, iy) in topo['vigas_y']:
-        reg = trib[('Y', ix, iy)]
-        w = at.carga_lineal(q, reg['area'], reg['luz'])
-        ops.eleLoad('-ele', tag, '-type', '-beamUniform', 0.0, -w, 0.0)
-        total += w * reg['luz']
-
-    if incluir_peso_propio:
-        total += _aplicar_peso_propio(topo)
-
-    return total
-
-
-def _aplicar_peso_propio(topo):
-    """
-    Peso propio de vigas (distribuido) y columnas/muros (nodal).
-    No pasa por el reparto tributario: cada barra carga el suyo.
-    """
-    total = 0.0
-    coords = topo['coords']
-
-    for lista, nombre_sec in ((topo['vigas_x'], SEC_VIGA_X),
-                              (topo['vigas_y'], SEC_VIGA_Y)):
-        s = SECCIONES[nombre_sec]
-        w = GAMMA * s['A']
-        for reg in lista:
-            tag, ni, nj = reg[0], reg[1], reg[2]
-            xi, yi, zi = coords[ni]
-            xj, yj, zj = coords[nj]
-            L = math.dist((xi, yi, zi), (xj, yj, zj))
-            ops.eleLoad('-ele', tag, '-type', '-beamUniform', 0.0, -w, 0.0)
-            total += w * L
-
-    sc = SECCIONES[SEC_COLUMNA]
-    for (tag, ni, nj) in topo['columnas']:
-        L = abs(coords[nj][2] - coords[ni][2])
-        W = GAMMA * sc['A'] * L
-        ops.load(ni, 0.0, 0.0, -W / 2.0, 0.0, 0.0, 0.0)
-        ops.load(nj, 0.0, 0.0, -W / 2.0, 0.0, 0.0, 0.0)
-        total += W
-
-    for m in topo['muros']:
-        L = abs(coords[m['nj']][2] - coords[m['ni']][2])
-        W = GAMMA * m['A'] * L
-        ops.load(m['ni'], 0.0, 0.0, -W / 2.0, 0.0, 0.0, 0.0)
-        ops.load(m['nj'], 0.0, 0.0, -W / 2.0, 0.0, 0.0, 0.0)
-        total += W
-
-    return total
-
-
-def nuevo_patron():
-    """timeSeries + pattern estandar (lineal)."""
-    ops.timeSeries('Linear', 1)
-    ops.pattern('Plain', 1, 1)
+def _exigir_modelo():
+    if MODELO is None:
+        raise RuntimeError('Corre primero construir_modelo().')
+    return MODELO
 
 
 # ============================================================
-# 10. SOLUCION
+# 7. NODOS  (sin indices de grilla: no hay grilla)
 # ============================================================
+def nodos_del_nivel(nivel):
+    """Los tags de los nodos de un nivel. Reemplaza a id_nodo(lev, ix, iy)."""
+    m = _exigir_modelo()
+    z = NIVELES_Z[nivel]
+    return [t for t, (_x, _y, zz) in m.nodos.items() if abs(zz - z) < 1e-9]
+
+
+def nodo_mas_cercano(x, y, nivel):
+    """El nodo del nivel mas cercano a (x, y). Para cargar un punto."""
+    m = _exigir_modelo()
+    cands = nodos_del_nivel(nivel)
+    if not cands:
+        raise RuntimeError('el nivel %d no tiene nodos' % nivel)
+    return min(cands, key=lambda t: (m.nodos[t][0] - x) ** 2
+               + (m.nodos[t][1] - y) ** 2)
+
+
+def nodo_de_esquina(nivel, esquina='SO'):
+    """
+    Un nodo de esquina del nivel, para aplicar carga EXCENTRICA.
+
+    La verificacion del diafragma necesita que el piso GIRE: con la
+    carga en el centro de masa el giro es cero y la prueba se cumple
+    sola sin probar nada.
+    """
+    objetivo = {'SO': (VENTANA['xmin'], VENTANA['ymin']),
+                'SE': (VENTANA['xmax'], VENTANA['ymin']),
+                'NO': (VENTANA['xmin'], VENTANA['ymax']),
+                'NE': (VENTANA['xmax'], VENTANA['ymax'])}[esquina]
+    return nodo_mas_cercano(objetivo[0], objetivo[1], nivel)
+
+
+def id_maestro(nivel):
+    """El nodo maestro del diafragma de un nivel."""
+    return _exigir_modelo().maestros[nivel]
+
+
+def id_nodo(nivel, ix, iy):
+    """
+    NO EXISTE en esta estructura. Se conserva solo para dar un mensaje
+    util a quien ejecute una celda vieja.
+    """
+    raise NotImplementedError(_CELDA_VIEJA + (
+        'Lo que pedia esa celda: id_nodo(nivel=%r, ix=%r, iy=%r).\n'
+        '\n'
+        'Por que no existe: en una grilla cada nodo es el cruce del eje ix\n'
+        'con el eje iy, asi que un nodo tiene direccion. En el LT2 los nodos\n'
+        'salen de MALLAR las vigas --46 por piso, en posiciones que no forman\n'
+        'grilla-- y el cruce del eje C con el eje 2 puede no tener ningun\n'
+        'nodo. Inventar un indice (ix, iy) seria mentir sobre la geometria.\n'
+        '\n'
+        'En su lugar:\n'
+        '   nodos_del_nivel(nivel)          todos los nodos de un piso\n'
+        '   nodo_mas_cercano(x, y, nivel)   el nodo mas cercano a un punto\n'
+        '   nodo_de_esquina(nivel, "SO")    para cargar excentrico'
+        % (nivel, ix, iy)))
+
+
+NODOS_POR_PISO = None       # se llena al construir: no es nX*nY
+
+
+# ============================================================
+# 8. AREAS TRIBUTARIAS
+# ============================================================
+def tributarias_por_viga(nivel=None):
+    """
+    Area tributaria de cada barra, indexada por su elementTag.
+
+    `nivel=None` devuelve TODOS los pisos; un entero, solo ese. En la
+    grilla vieja el reparto era el mismo para todos los pisos porque
+    la planta no cambiaba con la altura. Aca la planta del techo sale
+    de otra lamina y su carga de piso es distinta, asi que hay un
+    reparto POR PISO y hay que decir de cual se habla.
+
+    Cambia respecto de la grilla en dos cosas mas, y las dos son
+    porque la planta es irregular:
+
+      - la clave es el elementTag, no ('X'|'Y', ix, iy): no hay grilla
+        que indexar;
+      - los panos hay que ENCONTRARLOS. Son las caras del grafo plano
+        que forman las vigas y los muros de cada piso, y de ellas se
+        descartan las que el plano no rotula como losa (el hueco del
+        ascensor). Ver panos.py.
+
+    El criterio de reparto es el MISMO del lab: bisectrices a 45
+    grados, o sea que cada pedazo de losa carga al lado que tiene mas
+    cerca. En un pano rectangular sale el trapecio y el triangulo de
+    las formulas cerradas, y eso se verifica.
+    """
+    m = _exigir_modelo()
+    salida = {}
+
+    def guardar(tag, par, k, largo, q):
+        if nivel is not None and k != nivel:
+            return
+        A = m.area_trib.get(par, 0.0)
+        if A <= 0:
+            return
+        salida[tag] = {
+            'area': A,
+            'luz': largo,
+            'nivel': k,
+            'q': q,
+            'carga': q * A,
+            'w': q * A / largo if largo > 0 else 0.0,
+            'poligonos': m.poli_trib.get(par, []),
+        }
+
+    for tag, n1, n2, _sec, L, _peso, k in m.vigas:
+        guardar(tag, (min(n1, n2), max(n1, n2)), k, L, carga_de_piso(k))
+    for tag, n1, n2, _sec, L, k in m.brazos:
+        guardar(tag, (min(n1, n2), max(n1, n2)), k, L, carga_de_piso(k))
+
+    # Los muros tambien reciben losa: donde no hay viga, el pano
+    # descarga directo sobre el muro. Va como carga PUNTUAL en su
+    # baricentro, que es estaticamente equivalente.
+    for tag, _n1, n2, sec, _v, tipo, _peso in m.verticales:
+        if tipo != 'muro':
+            continue
+        A = m.area_trib_nodal.get(n2, 0.0)
+        if A <= 0:
+            continue
+        z = m.nodos[n2][2]
+        k = next((i for i, zz in enumerate(NIVELES_Z) if abs(zz - z) < 1e-9), None)
+        if k is None or k == 0:
+            continue
+        if nivel is not None and k != nivel:
+            continue
+        q = carga_de_piso(k)
+        salida[tag] = {'area': A, 'luz': sec.h, 'nivel': k, 'q': q,
+                       'carga': q * A, 'w': q * A / max(sec.h, 1e-9),
+                       'poligonos': m.poli_trib_nodal.get(n2, [])}
+    return salida
+
+
+def area_de_piso(nivel):
+    """
+    Area de losa de UN piso. No es la misma en todos: la del techo
+    sale de otra lamina, y aunque den casi igual, comparar contra el
+    promedio deja un residuo que despues parece un error de
+    conservacion de carga.
+    """
+    return _exigir_modelo().area_piso.get(nivel, 0.0)
+
+
+def area_de_planta():
+    """Area de losa de un piso: la suma de los panos detectados."""
+    m = _exigir_modelo()
+    if not m.area_piso:
+        return 0.0
+    return sum(m.area_piso.values()) / len(m.area_piso)
+
+
+AREA_PLANTA = None          # se llena al construir
+
+
+# ============================================================
+# 9. CARGAS
+# ============================================================
+def nuevo_patron(tag=1):
+    """
+    Deja el modelo listo para un caso de carga nuevo.
+
+    Las tres llamadas son obligatorias y omitir cualquiera da
+    resultados silenciosamente malos:
+
+      reset()              si no, los desplazamientos del caso
+                           anterior se acumulan;
+      setTime(0.0)         el timeSeries Linear escala por el tiempo y
+                           cada analyze(1) lo incrementa, asi que el
+                           2o caso saldria x2;
+      remove(loadPattern)  si no, las cargas anteriores siguen
+                           actuando.
+
+    NO crea el timeSeries ni el pattern: eso lo hace quien aplica la
+    carga (aplicar_carga_gravitacional / aplicar_sobrecarga). Crearlos
+    aca hacia que OpenSees rechazara el segundo con
+    "could not add timeseries to domain".
+    """
+    m = _exigir_modelo()
+    ops.reset()
+    ops.setTime(0.0)
+    try:
+        ops.remove('loadPattern', tag)
+    except Exception:
+        pass
+    return m
+
+
+def aplicar_carga_gravitacional(topo=None, q=None, incluir_peso_propio=True):
+    """
+    Aplica el caso G: peso propio + losa por areas tributarias.
+
+    Devuelve la carga total aplicada [kN], para verificar equilibrio.
+
+    `q` se acepta para no romper la firma que usaba el lab, pero se
+    IGNORA: en el LT2 la carga de piso no es un numero suelto, sale del
+    plano de cargas y es distinta en el techo. Pasarla a mano abriria
+    la puerta a que el informe y el modelo digan cosas distintas.
+    """
+    m = _exigir_modelo()
+    if q is not None and abs(q - Q_G) > 1e-9:
+        print('AVISO: se ignora q=%.4f. La carga de piso sale del plano de '
+              'cargas: %.4f kN/m2 en las plantas tipo y %.4f en el techo.'
+              % (q, Q_G, Q_G_TECHO))
+    if not incluir_peso_propio:
+        raise NotImplementedError(
+            'El caso G del LT2 incluye siempre el peso propio. Exportar un '
+            'G sin peso propio fue uno de los errores del lab: el JSON '
+            'describia otro problema que el que resolvio Python, y el '
+            'reanalisis daba 10.04 mm donde el modelo daba 11.78.')
+    m.aplicar_cargas('G')
+    return m.carga_total
+
+
+def aplicar_sobrecarga(topo=None):
+    """Aplica el caso Q (sobrecarga de uso). Devuelve el total [kN]."""
+    m = _exigir_modelo()
+    m.aplicar_cargas('Q')
+    return m.carga_total
+
+
 def resolver():
-    """
-    Analisis estatico lineal.
-
-    constraints('Transformation') es OBLIGATORIO aqui: con
-    rigidDiaphragm hay restricciones multipunto, y el manejador
-    'Plain' no las sabe tratar.
-    """
+    """Resuelve el sistema. Devuelve 0 si convergio."""
+    _exigir_modelo()
     ops.system('BandGeneral')
     ops.numberer('RCM')
+    # 'Transformation' es obligatorio con rigidDiaphragm: son
+    # restricciones multipunto y 'Plain' no las trata.
     ops.constraints('Transformation')
     ops.integrator('LoadControl', 1.0)
     ops.algorithm('Linear')
     ops.analysis('Static')
     ok = ops.analyze(1)
-    ops.reactions()
+    # Sin reactions() las reacciones salen TODAS CERO, y la
+    # verificacion de equilibrio "falla" con el modelo sano.
+    if ok == 0:
+        ops.reactions()
     return ok
+
+
+# ============================================================
+# 10. RESUMEN
+# ============================================================
+def resumen():
+    """Los numeros del modelo, para el informe y el notebook."""
+    m = _exigir_modelo()
+    return {
+        'nodos': len(m.nodos),
+        'columnas': len(TOPOLOGIA.get('columnas', [])),
+        'vigas': (len(TOPOLOGIA.get('vigas_x', []))
+                  + len(TOPOLOGIA.get('vigas_y', []))),
+        'muros': len(TOPOLOGIA.get('muros', [])),
+        'brazos': len(TOPOLOGIA.get('brazos', [])),
+        'apoyos': len(TOPOLOGIA.get('apoyos', [])),
+        'diafragmas': len(TOPOLOGIA.get('diafragmas', [])),
+        'area_planta': area_de_planta(),
+        'niveles': NIVELES_Z,
+    }
+
+
+# Se construye una vez al importar para que las constantes que
+# dependen del modelo (AREA_PLANTA, NODOS_POR_PISO) tengan valor sin
+# que el usuario tenga que acordarse de llamar a construir_modelo().
+def _inicializar():
+    global AREA_PLANTA, NODOS_POR_PISO
+    construir_modelo()
+    AREA_PLANTA = area_de_planta()
+    NODOS_POR_PISO = len(nodos_del_nivel(NIVEL_TIPO))
+
+
+_inicializar()

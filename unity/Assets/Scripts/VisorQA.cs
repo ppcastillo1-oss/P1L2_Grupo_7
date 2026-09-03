@@ -245,6 +245,14 @@ public class VisorQA : MonoBehaviour
 
     static bool EsApoyo(Nodo n)
     {
+        // Un nodo AUXILIAR no es un apoyo del edificio, aunque traiga
+        // restricciones. El maestro de un diafragma las trae siempre:
+        // sus GDL fuera del plano (uz, rx, ry) van restringidos porque
+        // el diafragma no los toca y dejarian la matriz singular.
+        // Pintarlo de verde lo hacia parecer una fundacion flotando en
+        // el centro de cada piso. El maestro ya se dibuja en su propia
+        // capa, la de diafragmas.
+        if (n.auxiliar) return false;
         if (n.fijo) return true;
         if (n.restricciones == null) return false;
         foreach (int r in n.restricciones) if (r != 0) return true;
@@ -552,16 +560,20 @@ public class VisorQA : MonoBehaviour
         bool vig = GUILayout.Toggle(visor.verVigas, "Vigas");
         bool mur = GUILayout.Toggle(visor.verMuros, "Muros");
         GUILayout.EndHorizontal();
+        GUILayout.BeginHorizontal();
+        bool brz = GUILayout.Toggle(visor.verBrazos, "Brazos rigidos");
+        GUILayout.EndHorizontal();
 
         bool perf = GUILayout.Toggle(visor.verPerfiles,
                                      "Perfiles reales (b x h)");
 
         if (nod != visor.verNodos || col != visor.verColumnas ||
             vig != visor.verVigas || mur != visor.verMuros ||
-            perf != visor.verPerfiles)
+            brz != visor.verBrazos || perf != visor.verPerfiles)
         {
             visor.verNodos = nod; visor.verColumnas = col;
             visor.verVigas = vig; visor.verMuros = mur;
+            visor.verBrazos = brz;
             visor.verPerfiles = perf;
             visor.Redibujar();          // el modelo lo redibuja el Visor
             refrescar = true;           // y las capas QA, este script

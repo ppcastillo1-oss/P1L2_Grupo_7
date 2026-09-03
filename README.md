@@ -1,10 +1,19 @@
 # P1 — Semana 2 · Edificio completo + gravedad + viewer Unity
 
-Laboratorio estructural digital del **Edificio de Ingeniería** (UANDES).
+Laboratorio estructural digital del **edificio LT2**, armado entero desde sus
+planos de cálculo `2024_22`.
 Grupo 7 — Pedro Castillo, Monserrat Cubillos, Eduardo Vergara.
 
 > **Regla de oro:** OpenSees **calcula** → el JSON es la **fuente de verdad** →
 > Unity solo **muestra**. Nunca se mete cálculo estructural en C#.
+
+> **Cambio de estructura.** Este laboratorio modelaba el Edificio de Ingeniería
+> idealizado como una grilla regular (8 × 6 ejes × 9 niveles, una columna en cada
+> cruce). Ahora modela el **LT2**, que no es una grilla: 8 pilares y 9 muros sin
+> simetría, vigas que se cruzan entre ellas, una caja de ascensores y una planta
+> que no es un rectángulo lleno. El código del laboratorio es el mismo; lo que
+> cambió es de dónde sale la estructura. Ver el encabezado de
+> `src/modelo_edificio.py` y la §1 de [reports/semana02.md](reports/semana02.md).
 
 ---
 
@@ -12,16 +21,30 @@ Grupo 7 — Pedro Castillo, Monserrat Cubillos, Eduardo Vergara.
 
 | | |
 |---|---|
-| Nodos | 656 |
-| Elementos | 1 232 (384 columnas, 656 vigas, 192 muros) |
-| Apoyos | 72 empotrados |
-| Diafragmas rígidos | 8 (uno por piso) |
-| Área de planta | 1 162.35 m² |
-| q_G | 7.75 kN/m² (losa 0.25 m × 25 + terminaciones 1.5) |
-| Carga total G | 121 709.58 kN |
-| Error de equilibrio | 2.2 × 10⁻¹⁰ kN |
+| Nodos | 247 |
+| Elementos | 430 (40 columnas, 230 vigas, 45 muros, 115 brazos rígidos) |
+| Apoyos | 17 empotrados en z = −7.97 |
+| Diafragmas rígidos | 5 (uno por piso) |
+| Niveles | −7.97 · −4.01 · −0.05 · +3.91 · +7.87 · +11.83 |
+| Área de losa | 496.87 m² por piso (suma de los paños detectados) |
+| q_G | 6.300 kN/m² plantas tipo · 5.711 kN/m² cielo 4° piso (del plano de cargas) |
+| Carga total G | 34 011.06 kN |
+| Error de equilibrio | 8.7 × 10⁻⁸ kN |
+| UZ máximo | −6.72 mm |
 
 Las **5 verificaciones del Lab pasan**: `python verificar_lab2.py`
+
+### El modelo del LT2 vive en otro repo
+
+La estructura la construye [`A1P1.0_Grupo_7`](https://github.com/bitscochits/A1P1.0_Grupo_7)
+(el ingestor de planos, el mallador y los paños). Este laboratorio lo **importa**,
+para que haya una sola copia del modelo. Se espera **al lado** de este repo; si
+está en otra parte:
+
+```powershell
+$env:LT2_SRC = "C:\ruta\a\A1P1.0_Grupo_7\src"
+uta\A1P1.0_Grupo_7\src"
+```
 
 ---
 

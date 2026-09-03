@@ -225,6 +225,7 @@ MonoBehaviour:
   colorColumna: {r: 0.36, g: 0.62, b: 1, a: 1}
   colorViga: {r: 0.88, g: 0.48, b: 0.37, a: 1}
   colorMuro: {r: 0.65, g: 0.65, b: 0.7, a: 1}
+  colorBrazo: {r: 0.85, g: 0.3, b: 0.75, a: 1}
   colorApoyo: {r: 0.18, g: 0.6, b: 0.37, a: 1}
   colorNodoAuxiliar: {r: 0.55, g: 0.58, b: 0.62, a: 1}
   colorDeformada: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
@@ -236,6 +237,7 @@ MonoBehaviour:
   verColumnas: 1
   verVigas: 1
   verMuros: 1
+  verBrazos: 1
 --- !u!4 &258344398
 Transform:
   m_ObjectHideFlags: 0
