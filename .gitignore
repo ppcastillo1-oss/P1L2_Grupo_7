@@ -58,3 +58,8 @@ Sin*título*.png
 
 # Snapshot viejo de estos mismos archivos; el repo es la fuente de verdad
 laboratorio_estructural.zip
+
+# ============================================================
+#  Paquetes de entrega (zips grandes, se regeneran)
+# ============================================================
+entrega/
