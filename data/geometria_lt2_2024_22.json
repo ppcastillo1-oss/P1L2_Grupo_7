@@ -1,0 +1,2679 @@
+{
+ "proyecto": "LT2 - Proyecto de calculo 2024_22 (M. Kupfer C., octubre 2024)",
+ "perfil": "lt2_2024_22.json",
+ "carpeta_dxf": "C:\\Users\\Administrador\\OneDrive\\Escritorio\\UANDES\\202602\\Metodos computacionales\\P1\\Planos\\LT2_CAL_dxf",
+ "unidades": "m  (el dibujo estaba en cm)",
+ "lamina_de_referencia": "2024_22-101",
+ "ventana": {
+  "xmin": 10.365,
+  "ymin": 9.547,
+  "xmax": 42.75,
+  "ymax": 28.697
+ },
+ "ejes": {
+  "X": [
+   {
+    "nombre": "A'",
+    "coord": 10.9648
+   },
+   {
+    "nombre": "A",
+    "coord": 14.7446
+   },
+   {
+    "nombre": "B",
+    "coord": 22.2446
+   },
+   {
+    "nombre": "C",
+    "coord": 32.2363
+   },
+   {
+    "nombre": "B'",
+    "coord": 35.4148
+   },
+   {
+    "nombre": "C'",
+    "coord": 39.7866
+   },
+   {
+    "nombre": "D",
+    "coord": 42.2363
+   },
+   {
+    "nombre": "E1",
+    "coord": 42.4068
+   },
+   {
+    "nombre": "D'",
+    "coord": 42.9191
+   },
+   {
+    "nombre": "E'",
+    "coord": 43.7471
+   }
+  ],
+  "Y": [
+   {
+    "nombre": "3",
+    "coord": 11.047
+   },
+   {
+    "nombre": "2A'",
+    "coord": 15.312
+   },
+   {
+    "nombre": "2",
+    "coord": 18.297
+   },
+   {
+    "nombre": "1A'",
+    "coord": 22.932
+   },
+   {
+    "nombre": "1'",
+    "coord": 23.9918
+   },
+   {
+    "nombre": "1",
+    "coord": 27.197
+   },
+   {
+    "nombre": "8A",
+    "coord": 33.617
+   },
+   {
+    "nombre": "8B",
+    "coord": 37.917
+   }
+  ]
+ },
+ "niveles": {
+  "confirmados_por_todas_las_elevaciones": [
+   -8.57,
+   -7.97,
+   -4.01,
+   -0.05,
+   3.91,
+   7.87,
+   11.83
+  ],
+  "alturas_entre_niveles": [
+   0.6,
+   3.96,
+   3.96,
+   3.96,
+   3.96,
+   3.96
+  ],
+  "todos": [
+   {
+    "z": -9.77,
+    "laminas": 5,
+    "visto_en": [
+     "2024_22-300",
+     "2024_22-301",
+     "2024_22-303",
+     "2024_22-304",
+     "2024_22-305"
+    ]
+   },
+   {
+    "z": -9.57,
+    "laminas": 5,
+    "visto_en": [
+     "2024_22-300",
+     "2024_22-302",
+     "2024_22-303",
+     "2024_22-304",
+     "2024_22-305"
+    ]
+   },
+   {
+    "z": -9.53,
+    "laminas": 2,
+    "visto_en": [
+     "2024_22-302",
+     "2024_22-304"
+    ]
+   },
+   {
+    "z": -9.17,
+    "laminas": 1,
+    "visto_en": [
+     "2024_22-301"
+    ]
+   },
+   {
+    "z": -8.93,
+    "laminas": 2,
+    "visto_en": [
+     "2024_22-302",
+     "2024_22-304"
+    ]
+   },
+   {
+    "z": -8.57,
+    "laminas": 6,
+    "visto_en": [
+     "2024_22-300",
+     "2024_22-301",
+     "2024_22-302",
+     "2024_22-303",
+     "2024_22-304",
+     "2024_22-305"
+    ]
+   },
+   {
+    "z": -8.185,
+    "laminas": 1,
+    "visto_en": [
+     "2024_22-302"
+    ]
+   },
+   {
+    "z": -8.12,
+    "laminas": 2,
+    "visto_en": [
+     "2024_22-302",
+     "2024_22-304"
+    ]
+   },
+   {
+    "z": -7.97,
+    "laminas": 6,
+    "visto_en": [
+     "2024_22-300",
+     "2024_22-301",
+     "2024_22-302",
+     "2024_22-303",
+     "2024_22-304",
+     "2024_22-305"
+    ]
+   },
+   {
+    "z": -6.97,
+    "laminas": 1,
+    "visto_en": [
+     "2024_22-302"
+    ]
+   },
+   {
+    "z": -6.371,
+    "laminas": 1,
+    "visto_en": [
+     "2024_22-304"
+    ]
+   },
+   {
+    "z": -5.945,
+    "laminas": 1,
+    "visto_en": [
+     "2024_22-302"
+    ]
+   },
+   {
+    "z": -4.73,
+    "laminas": 1,
+    "visto_en": [
+     "2024_22-302"
+    ]
+   },
+   {
+    "z": -4.025,
+    "laminas": 1,
+    "visto_en": [
+     "2024_22-302"
+    ]
+   },
+   {
+    "z": -4.01,
+    "laminas": 6,
+    "visto_en": [
+     "2024_22-300",
+     "2024_22-301",
+     "2024_22-302",
+     "2024_22-303",
+     "2024_22-304",
+     "2024_22-305"
+    ]
+   },
+   {
+    "z": -2.81,
+    "laminas": 1,
+    "visto_en": [
+     "2024_22-302"
+    ]
+   },
+   {
+    "z": -0.05,
+    "laminas": 6,
+    "visto_en": [
+     "2024_22-300",
+     "2024_22-301",
+     "2024_22-302",
+     "2024_22-303",
+     "2024_22-304",
+     "2024_22-305"
+    ]
+   },
+   {
+    "z": 3.91,
+    "laminas": 6,
+    "visto_en": [
+     "2024_22-300",
+     "2024_22-301",
+     "2024_22-302",
+     "2024_22-303",
+     "2024_22-304",
+     "2024_22-305"
+    ]
+   },
+   {
+    "z": 7.87,
+    "laminas": 6,
+    "visto_en": [
+     "2024_22-300",
+     "2024_22-301",
+     "2024_22-302",
+     "2024_22-303",
+     "2024_22-304",
+     "2024_22-305"
+    ]
+   },
+   {
+    "z": 11.83,
+    "laminas": 6,
+    "visto_en": [
+     "2024_22-300",
+     "2024_22-301",
+     "2024_22-302",
+     "2024_22-303",
+     "2024_22-304",
+     "2024_22-305"
+    ]
+   },
+   {
+    "z": 11.92,
+    "laminas": 2,
+    "visto_en": [
+     "2024_22-300",
+     "2024_22-304"
+    ]
+   },
+   {
+    "z": 12.58,
+    "laminas": 2,
+    "visto_en": [
+     "2024_22-300",
+     "2024_22-303"
+    ]
+   }
+  ],
+  "por_lamina": {
+   "2024_22-300": {
+    "cotas_candidatas": 17,
+    "cotas_usadas": 17,
+    "cotas_descartadas": [],
+    "desfase": 22.4164,
+    "dispersion_del_desfase": 0.0,
+    "coherente": true,
+    "niveles": [
+     -9.77,
+     -9.57,
+     -8.57,
+     -7.97,
+     -4.01,
+     -0.05,
+     3.91,
+     7.87,
+     11.83,
+     11.92,
+     12.58
+    ],
+    "alturas_entre_pisos": [
+     0.2,
+     1.0,
+     0.6,
+     3.96,
+     3.96,
+     3.96,
+     3.96,
+     3.96,
+     0.09,
+     0.66
+    ]
+   },
+   "2024_22-301": {
+    "cotas_candidatas": 9,
+    "cotas_usadas": 9,
+    "cotas_descartadas": [],
+    "desfase": 21.9934,
+    "dispersion_del_desfase": 0.0,
+    "coherente": true,
+    "niveles": [
+     -9.77,
+     -9.17,
+     -8.57,
+     -7.97,
+     -4.01,
+     -0.05,
+     3.91,
+     7.87,
+     11.83
+    ],
+    "alturas_entre_pisos": [
+     0.6,
+     0.6,
+     0.6,
+     3.96,
+     3.96,
+     3.96,
+     3.96,
+     3.96
+    ]
+   },
+   "2024_22-302": {
+    "cotas_candidatas": 26,
+    "cotas_usadas": 17,
+    "cotas_descartadas": [
+     {
+      "texto": "-8.185",
+      "y": 26.7,
+      "desfase": 34.885
+     },
+     {
+      "texto": "-8.12",
+      "y": 26.765,
+      "desfase": 34.885
+     },
+     {
+      "texto": "-9.53",
+      "y": 25.355,
+      "desfase": 34.885
+     },
+     {
+      "texto": "-8.93",
+      "y": 25.955,
+      "desfase": 34.885
+     },
+     {
+      "texto": "-5.945",
+      "y": 28.94,
+      "desfase": 34.885
+     },
+     {
+      "texto": "-7.39",
+      "y": 27.495,
+      "desfase": 34.885
+     },
+     {
+      "texto": "-4.025",
+      "y": 30.86,
+      "desfase": 34.885
+     },
+     {
+      "texto": "-5.15",
+      "y": 29.735,
+      "desfase": 34.885
+     },
+     {
+      "texto": "-3.23",
+      "y": 31.655,
+      "desfase": 34.885
+     }
+    ],
+    "desfase": 21.4643,
+    "dispersion_del_desfase": 0.0,
+    "coherente": true,
+    "niveles": [
+     -9.57,
+     -9.53,
+     -8.93,
+     -8.57,
+     -8.185,
+     -8.12,
+     -7.97,
+     -6.97,
+     -5.945,
+     -4.73,
+     -4.025,
+     -4.01,
+     -2.81,
+     -0.05,
+     3.91,
+     7.87,
+     11.83
+    ],
+    "alturas_entre_pisos": [
+     0.04,
+     0.6,
+     0.36,
+     0.385,
+     0.065,
+     0.15,
+     1.0,
+     1.025,
+     1.215,
+     0.705,
+     0.015,
+     1.2,
+     2.76,
+     3.96,
+     3.96,
+     3.96
+    ]
+   },
+   "2024_22-303": {
+    "cotas_candidatas": 40,
+    "cotas_usadas": 20,
+    "cotas_descartadas": [
+     {
+      "texto": "-4.01",
+      "y": 7.227,
+      "desfase": 11.237
+     },
+     {
+      "texto": "-7.97",
+      "y": 3.267,
+      "desfase": 11.237
+     },
+     {
+      "texto": "-0.05",
+      "y": 11.187,
+      "desfase": 11.237
+     },
+     {
+      "texto": "+3.91",
+      "y": 15.147,
+      "desfase": 11.237
+     },
+     {
+      "texto": "-9.77",
+      "y": 1.467,
+      "desfase": 11.237
+     },
+     {
+      "texto": "-9.57",
+      "y": 1.667,
+      "desfase": 11.237
+     },
+     {
+      "texto": "-8.57",
+      "y": 2.667,
+      "desfase": 11.237
+     },
+     {
+      "texto": "+7.87",
+      "y": 19.107,
+      "desfase": 11.237
+     },
+     {
+      "texto": "+11.83",
+      "y": 23.067,
+      "desfase": 11.237
+     },
+     {
+      "texto": "+12.58",
+      "y": 23.817,
+      "desfase": 11.237
+     },
+     {
+      "texto": "-7.97",
+      "y": 5.404,
+      "desfase": 13.374
+     },
+     {
+      "texto": "-0.05",
+      "y": 13.324,
+      "desfase": 13.374
+     },
+     {
+      "texto": "+3.91",
+      "y": 17.284,
+      "desfase": 13.374
+     },
+     {
+      "texto": "-4.01",
+      "y": 9.364,
+      "desfase": 13.374
+     },
+     {
+      "texto": "-9.57",
+      "y": 3.804,
+      "desfase": 13.374
+     },
+     {
+      "texto": "-9.77",
+      "y": 3.604,
+      "desfase": 13.374
+     },
+     {
+      "texto": "-8.57",
+      "y": 4.804,
+      "desfase": 13.374
+     },
+     {
+      "texto": "+7.87",
+      "y": 21.244,
+      "desfase": 13.374
+     },
+     {
+      "texto": "+11.83",
+      "y": 25.204,
+      "desfase": 13.374
+     },
+     {
+      "texto": "+12.58",
+      "y": 25.954,
+      "desfase": 13.374
+     }
+    ],
+    "desfase": 24.8828,
+    "dispersion_del_desfase": 0.0,
+    "coherente": true,
+    "niveles": [
+     -9.77,
+     -9.57,
+     -8.57,
+     -7.97,
+     -4.01,
+     -0.05,
+     3.91,
+     7.87,
+     11.83,
+     12.58
+    ],
+    "alturas_entre_pisos": [
+     0.2,
+     1.0,
+     0.6,
+     3.96,
+     3.96,
+     3.96,
+     3.96,
+     3.96,
+     0.75
+    ]
+   },
+   "2024_22-304": {
+    "cotas_candidatas": 26,
+    "cotas_usadas": 22,
+    "cotas_descartadas": [
+     {
+      "texto": "-8.12",
+      "y": 27.019,
+      "desfase": 35.139
+     },
+     {
+      "texto": "-9.53",
+      "y": 25.609,
+      "desfase": 35.139
+     },
+     {
+      "texto": "-8.93",
+      "y": 26.209,
+      "desfase": 35.139
+     },
+     {
+      "texto": "-4.025",
+      "y": 31.114,
+      "desfase": 35.139
+     }
+    ],
+    "desfase": 24.3439,
+    "dispersion_del_desfase": 0.0,
+    "coherente": true,
+    "niveles": [
+     -9.77,
+     -9.57,
+     -9.53,
+     -8.93,
+     -8.57,
+     -8.12,
+     -7.97,
+     -6.371,
+     -4.01,
+     -0.05,
+     3.91,
+     7.87,
+     11.83,
+     11.92
+    ],
+    "alturas_entre_pisos": [
+     0.2,
+     0.04,
+     0.6,
+     0.36,
+     0.45,
+     0.15,
+     1.599,
+     2.361,
+     3.96,
+     3.96,
+     3.96,
+     3.96,
+     0.09
+    ]
+   },
+   "2024_22-305": {
+    "cotas_candidatas": 34,
+    "cotas_usadas": 17,
+    "cotas_descartadas": [
+     {
+      "texto": "+3.91",
+      "y": 17.743,
+      "desfase": 13.833
+     },
+     {
+      "texto": "-4.01",
+      "y": 9.823,
+      "desfase": 13.833
+     },
+     {
+      "texto": "-0.05",
+      "y": 13.783,
+      "desfase": 13.833
+     },
+     {
+      "texto": "-7.97",
+      "y": 5.863,
+      "desfase": 13.833
+     },
+     {
+      "texto": "-9.57",
+      "y": 4.263,
+      "desfase": 13.833
+     },
+     {
+      "texto": "-8.57",
+      "y": 5.263,
+      "desfase": 13.833
+     },
+     {
+      "texto": "+7.87",
+      "y": 21.703,
+      "desfase": 13.833
+     },
+     {
+      "texto": "+11.83",
+      "y": 25.663,
+      "desfase": 13.833
+     },
+     {
+      "texto": "-4.01",
+      "y": 10.17,
+      "desfase": 14.18
+     },
+     {
+      "texto": "-0.05",
+      "y": 14.13,
+      "desfase": 14.18
+     },
+     {
+      "texto": "+3.91",
+      "y": 18.09,
+      "desfase": 14.18
+     },
+     {
+      "texto": "-7.97",
+      "y": 6.21,
+      "desfase": 14.18
+     },
+     {
+      "texto": "-9.57",
+      "y": 4.61,
+      "desfase": 14.18
+     },
+     {
+      "texto": "-8.57",
+      "y": 5.61,
+      "desfase": 14.18
+     },
+     {
+      "texto": "-9.77",
+      "y": 4.41,
+      "desfase": 14.18
+     },
+     {
+      "texto": "+7.87",
+      "y": 22.05,
+      "desfase": 14.18
+     },
+     {
+      "texto": "+11.83",
+      "y": 26.01,
+      "desfase": 14.18
+     }
+    ],
+    "desfase": 24.3106,
+    "dispersion_del_desfase": 0.0,
+    "coherente": true,
+    "niveles": [
+     -9.77,
+     -9.57,
+     -8.57,
+     -7.97,
+     -4.01,
+     -0.05,
+     3.91,
+     7.87,
+     11.83
+    ],
+    "alturas_entre_pisos": [
+     0.2,
+     1.0,
+     0.6,
+     3.96,
+     3.96,
+     3.96,
+     3.96,
+     3.96
+    ]
+   }
+  }
+ },
+ "plantas": {
+  "2024_22-100": {
+   "papel": "planta_fundaciones",
+   "registro": {
+    "dx": 5.0,
+    "dy": 0.3,
+    "residuo_max": 3e-05,
+    "ok": true,
+    "ejes_usados_x": [
+     "A",
+     "A'",
+     "B",
+     "B'",
+     "C",
+     "C'",
+     "D",
+     "D'",
+     "E'",
+     "E1"
+    ],
+    "ejes_usados_y": [
+     "1",
+     "1'",
+     "2",
+     "3",
+     "8A",
+     "8B"
+    ]
+   },
+   "ejes": {
+    "X": [
+     {
+      "nombre": "A'",
+      "coord": 10.9648
+     },
+     {
+      "nombre": "A",
+      "coord": 14.7446
+     },
+     {
+      "nombre": "B",
+      "coord": 22.2446
+     },
+     {
+      "nombre": "C",
+      "coord": 32.2363
+     },
+     {
+      "nombre": "B'",
+      "coord": 35.4148
+     },
+     {
+      "nombre": "C'",
+      "coord": 39.7866
+     },
+     {
+      "nombre": "D",
+      "coord": 42.2363
+     },
+     {
+      "nombre": "E1",
+      "coord": 42.4068
+     },
+     {
+      "nombre": "D'",
+      "coord": 42.9191
+     },
+     {
+      "nombre": "E'",
+      "coord": 43.7471
+     }
+    ],
+    "Y": [
+     {
+      "nombre": "3",
+      "coord": 11.047
+     },
+     {
+      "nombre": "2",
+      "coord": 18.297
+     },
+     {
+      "nombre": "1'",
+      "coord": 23.9919
+     },
+     {
+      "nombre": "1",
+      "coord": 27.197
+     },
+     {
+      "nombre": "8A",
+      "coord": 33.6169
+     },
+     {
+      "nombre": "8B",
+      "coord": 37.9169
+     }
+    ]
+   },
+   "muros": [
+    {
+     "x1": 42.577,
+     "y1": 10.5793,
+     "x2": 42.577,
+     "y2": 18.5293,
+     "largo": 7.95,
+     "espesor": 0.25
+    },
+    {
+     "x1": 11.002,
+     "y1": 25.2544,
+     "x2": 11.002,
+     "y2": 28.1743,
+     "largo": 2.92,
+     "espesor": 0.6
+    },
+    {
+     "x1": 11.002,
+     "y1": 9.8393,
+     "x2": 11.002,
+     "y2": 12.7543,
+     "largo": 2.915,
+     "espesor": 0.6
+    },
+    {
+     "x1": 39.932,
+     "y1": 20.9292,
+     "x2": 39.932,
+     "y2": 23.7493,
+     "largo": 2.8202,
+     "espesor": 0.25
+    },
+    {
+     "x1": 42.577,
+     "y1": 20.9293,
+     "x2": 42.577,
+     "y2": 23.7493,
+     "largo": 2.82,
+     "espesor": 0.25
+    },
+    {
+     "x1": 42.577,
+     "y1": 24.0493,
+     "x2": 42.577,
+     "y2": 26.7293,
+     "largo": 2.68,
+     "espesor": 0.25
+    },
+    {
+     "x1": 40.057,
+     "y1": 23.8993,
+     "x2": 42.452,
+     "y2": 23.8993,
+     "largo": 2.395,
+     "espesor": 0.3
+    },
+    {
+     "x1": 11.502,
+     "y1": 27.1793,
+     "x2": 12.952,
+     "y2": 27.1793,
+     "largo": 1.45,
+     "espesor": 0.3
+    },
+    {
+     "x1": 11.502,
+     "y1": 10.7293,
+     "x2": 12.952,
+     "y2": 10.7293,
+     "largo": 1.45,
+     "espesor": 0.3
+    }
+   ],
+   "pilares": [
+    {
+     "x": 22.352,
+     "y": 10.9293,
+     "b": 0.7,
+     "h": 0.7,
+     "etiqueta": "20/160",
+     "contorno_cerrado": true
+    },
+    {
+     "x": 32.352,
+     "y": 10.9293,
+     "b": 0.7,
+     "h": 0.7,
+     "etiqueta": "20/160",
+     "contorno_cerrado": true
+    },
+    {
+     "x": 22.352,
+     "y": 18.1793,
+     "b": 0.7,
+     "h": 0.7,
+     "etiqueta": "20/180",
+     "contorno_cerrado": true
+    },
+    {
+     "x": 32.352,
+     "y": 18.1793,
+     "b": 0.7,
+     "h": 0.7,
+     "etiqueta": "20/180",
+     "contorno_cerrado": true
+    },
+    {
+     "x": 22.352,
+     "y": 27.0793,
+     "b": 0.7,
+     "h": 0.7,
+     "etiqueta": "20/160",
+     "contorno_cerrado": true
+    },
+    {
+     "x": 32.352,
+     "y": 27.0793,
+     "b": 0.7,
+     "h": 0.7,
+     "etiqueta": "20/160",
+     "contorno_cerrado": true
+    },
+    {
+     "x": 42.352,
+     "y": 27.0793,
+     "b": 0.7,
+     "h": 0.7,
+     "etiqueta": "V.F. 20/160",
+     "contorno_cerrado": false
+    }
+   ],
+   "vigas": [
+    {
+     "x1": 12.952,
+     "y1": 10.7293,
+     "x2": 42.452,
+     "y2": 10.7293,
+     "largo": 29.5,
+     "ancho": 0.2,
+     "alto": 1.2,
+     "etiqueta": "V.F. 20/120"
+    },
+    {
+     "x1": 11.102,
+     "y1": 18.1793,
+     "x2": 32.002,
+     "y2": 18.1793,
+     "largo": 20.9,
+     "ancho": 0.2,
+     "alto": 1.8,
+     "etiqueta": "20/180"
+    },
+    {
+     "x1": 12.952,
+     "y1": 27.1793,
+     "x2": 42.002,
+     "y2": 27.1793,
+     "largo": 29.05,
+     "ancho": 0.2,
+     "alto": 1.6,
+     "etiqueta": "20/160"
+    },
+    {
+     "x1": 32.352,
+     "y1": 11.2793,
+     "x2": 32.352,
+     "y2": 26.7293,
+     "largo": 15.45,
+     "ancho": 0.2,
+     "alto": 1.8,
+     "etiqueta": "20/180"
+    },
+    {
+     "x1": 22.352,
+     "y1": 11.2793,
+     "x2": 22.352,
+     "y2": 26.7293,
+     "largo": 15.45,
+     "ancho": 0.2,
+     "alto": 1.8,
+     "etiqueta": "20/180"
+    },
+    {
+     "x1": 11.002,
+     "y1": 12.7543,
+     "x2": 11.002,
+     "y2": 25.2544,
+     "largo": 12.5,
+     "ancho": 0.2,
+     "alto": 1.6,
+     "etiqueta": "20/160"
+    },
+    {
+     "x1": 40.057,
+     "y1": 20.9791,
+     "x2": 42.452,
+     "y2": 20.9791,
+     "largo": 2.395,
+     "ancho": 0.2,
+     "alto": 1.6,
+     "etiqueta": "V.F. 20/160"
+    }
+   ],
+   "auditoria": {
+    "ejes": {
+     "burbujas_leidas": 26,
+     "ejes_resueltos": 16,
+     "ejes_X": 10,
+     "ejes_Y": 6,
+     "sin_linea_de_apoyo": [
+      "E'"
+     ],
+     "clasificados_por_linea": [
+      {
+       "nombre": "8A",
+       "direccion": "Y"
+      },
+      {
+       "nombre": "E1",
+       "direccion": "X"
+      },
+      {
+       "nombre": "B'",
+       "direccion": "X"
+      }
+     ],
+     "burbujas_ambiguas": [],
+     "burbujas_sin_clasificar": [],
+     "rieles_x": [
+      2.286,
+      43.936
+     ],
+     "rieles_y": [
+      5.123,
+      32.523
+     ]
+    },
+    "alineacion_de_ejes": {
+     "aplicado": true,
+     "tolerancia_m": 0.2,
+     "elementos_movidos": 4,
+     "corrimiento_maximo_m": 0.2,
+     "detalle": [
+      {
+       "tipo": "muro",
+       "corrimiento_m": 0.2,
+       "largo_m": 2.92,
+       "se_alineo_con": "viga de 12.50 m"
+      },
+      {
+       "tipo": "muro",
+       "corrimiento_m": 0.2,
+       "largo_m": 2.92,
+       "se_alineo_con": "viga de 12.50 m"
+      },
+      {
+       "tipo": "muro",
+       "corrimiento_m": -0.05,
+       "largo_m": 1.45,
+       "se_alineo_con": "viga de 29.05 m"
+      },
+      {
+       "tipo": "muro",
+       "corrimiento_m": -0.05,
+       "largo_m": 1.45,
+       "se_alineo_con": "viga de 29.50 m"
+      }
+     ]
+    },
+    "muros": {
+     "segmentos_en_la_capa": 28,
+     "fusion_de_rectas": {
+      "entraron": 30,
+      "salieron": 28,
+      "fusiones": 0,
+      "puentes_sobre_un_cruce": 2,
+      "huecos_puenteados": [
+       0.3,
+       0.3
+      ]
+     },
+     "descartados_por_cortos": 11,
+     "caras_consideradas": 17,
+     "muros_emparejados": 9,
+     "caras_sin_pareja": 0,
+     "caras_sin_pareja_largos": [],
+     "tramos_rechazados_por_ocupado": 0,
+     "largo_total_caras": 55.65,
+     "largo_de_cara_emparejado": 54.8,
+     "cobertura": 0.9847,
+     "largo_total_muros": 27.4,
+     "espesores": [
+      [
+       0.25,
+       4
+      ],
+      [
+       0.3,
+       3
+      ],
+      [
+       0.6,
+       2
+      ]
+     ],
+     "descartados_fuera_de_la_ventana": 48
+    },
+    "pilares": {
+     "segmentos_en_la_capa": 37,
+     "grupos_encontrados": 8,
+     "pilares": 7,
+     "grupos_no_rectangulares": [
+      {
+       "n_segmentos": 6,
+       "centro": [
+        14.852,
+        18.179
+       ],
+       "caja": [
+        0.7,
+        0.7
+       ]
+      }
+     ],
+     "rectangulos_fuera_de_rango": [],
+     "con_etiqueta": 7,
+     "contorno_abierto": [
+      {
+       "centro": [
+        42.352,
+        27.079
+       ],
+       "seccion": [
+        0.7,
+        0.7
+       ]
+      }
+     ],
+     "etiqueta_no_calza_con_el_dibujo": [
+      {
+       "centro": [
+        22.352,
+        10.929
+       ],
+       "medido": [
+        0.7,
+        0.7
+       ],
+       "etiqueta": "20/160"
+      },
+      {
+       "centro": [
+        32.352,
+        10.929
+       ],
+       "medido": [
+        0.7,
+        0.7
+       ],
+       "etiqueta": "20/160"
+      },
+      {
+       "centro": [
+        22.352,
+        18.179
+       ],
+       "medido": [
+        0.7,
+        0.7
+       ],
+       "etiqueta": "20/180"
+      },
+      {
+       "centro": [
+        32.352,
+        18.179
+       ],
+       "medido": [
+        0.7,
+        0.7
+       ],
+       "etiqueta": "20/180"
+      },
+      {
+       "centro": [
+        22.352,
+        27.079
+       ],
+       "medido": [
+        0.7,
+        0.7
+       ],
+       "etiqueta": "20/160"
+      },
+      {
+       "centro": [
+        32.352,
+        27.079
+       ],
+       "medido": [
+        0.7,
+        0.7
+       ],
+       "etiqueta": "20/160"
+      },
+      {
+       "centro": [
+        42.352,
+        27.079
+       ],
+       "medido": [
+        0.7,
+        0.7
+       ],
+       "etiqueta": "V.F. 20/160"
+      }
+     ],
+     "secciones": [
+      [
+       "0.70x0.70",
+       7
+      ]
+     ],
+     "descartados_fuera_de_la_ventana": 0
+    },
+    "vigas": {
+     "segmentos_en_la_capa": 33,
+     "fusion_de_rectas": {
+      "entraron": 87,
+      "salieron": 33,
+      "fusiones": 54,
+      "puentes_sobre_un_cruce": 0,
+      "huecos_puenteados": []
+     },
+     "descartados_por_cortos": 1,
+     "caras_consideradas": 32,
+     "muros_emparejados": 16,
+     "caras_sin_pareja": 1,
+     "caras_sin_pareja_largos": [
+      2.35
+     ],
+     "tramos_rechazados_por_ocupado": 0,
+     "largo_total_caras": 241.69,
+     "largo_de_cara_emparejado": 238.89,
+     "cobertura": 0.9884,
+     "largo_total_muros": 119.45,
+     "espesores": [
+      [
+       0.2,
+       16
+      ]
+     ],
+     "vigas": 7,
+     "con_etiqueta": 7,
+     "sin_alto": 0,
+     "ancho_no_calza_con_la_etiqueta": [],
+     "secciones": [
+      [
+       "0.20/1.20",
+       1
+      ],
+      [
+       "0.20/1.60",
+       3
+      ],
+      [
+       "0.20/1.80",
+       3
+      ]
+     ],
+     "largo_total_vigas": 125.25,
+     "union_de_trozos": {
+      "entraron": 16,
+      "salieron": 7,
+      "uniones": 9
+     },
+     "descartados_fuera_de_la_ventana": 20
+    }
+   }
+  },
+  "2024_22-101": {
+   "papel": "planta_tipo",
+   "registro": {
+    "dx": 0.0,
+    "dy": 0.0,
+    "residuo_max": 0.0,
+    "ok": true,
+    "ejes_usados_x": [
+     "A",
+     "A'",
+     "B",
+     "B'",
+     "C",
+     "C'",
+     "D",
+     "D'",
+     "E'",
+     "E1"
+    ],
+    "ejes_usados_y": [
+     "1",
+     "1'",
+     "1A'",
+     "2",
+     "2A'",
+     "3",
+     "8A",
+     "8B"
+    ]
+   },
+   "ejes": {
+    "X": [
+     {
+      "nombre": "A'",
+      "coord": 10.9648
+     },
+     {
+      "nombre": "A",
+      "coord": 14.7446
+     },
+     {
+      "nombre": "B",
+      "coord": 22.2446
+     },
+     {
+      "nombre": "C",
+      "coord": 32.2363
+     },
+     {
+      "nombre": "B'",
+      "coord": 35.4148
+     },
+     {
+      "nombre": "C'",
+      "coord": 39.7866
+     },
+     {
+      "nombre": "D",
+      "coord": 42.2363
+     },
+     {
+      "nombre": "E1",
+      "coord": 42.4068
+     },
+     {
+      "nombre": "D'",
+      "coord": 42.9191
+     },
+     {
+      "nombre": "E'",
+      "coord": 43.7471
+     }
+    ],
+    "Y": [
+     {
+      "nombre": "3",
+      "coord": 11.047
+     },
+     {
+      "nombre": "2A'",
+      "coord": 15.312
+     },
+     {
+      "nombre": "2",
+      "coord": 18.297
+     },
+     {
+      "nombre": "1A'",
+      "coord": 22.932
+     },
+     {
+      "nombre": "1'",
+      "coord": 23.9918
+     },
+     {
+      "nombre": "1",
+      "coord": 27.197
+     },
+     {
+      "nombre": "8A",
+      "coord": 33.617
+     },
+     {
+      "nombre": "8B",
+      "coord": 37.917
+     }
+    ]
+   },
+   "muros": [
+    {
+     "x1": 42.577,
+     "y1": 10.5793,
+     "x2": 42.577,
+     "y2": 18.5293,
+     "largo": 7.95,
+     "espesor": 0.25
+    },
+    {
+     "x1": 11.302,
+     "y1": 25.2543,
+     "x2": 11.302,
+     "y2": 28.1743,
+     "largo": 2.92,
+     "espesor": 0.6
+    },
+    {
+     "x1": 11.302,
+     "y1": 9.8393,
+     "x2": 11.302,
+     "y2": 12.7543,
+     "largo": 2.915,
+     "espesor": 0.6
+    },
+    {
+     "x1": 39.932,
+     "y1": 20.9292,
+     "x2": 39.932,
+     "y2": 23.7493,
+     "largo": 2.8202,
+     "espesor": 0.25
+    },
+    {
+     "x1": 42.577,
+     "y1": 20.9293,
+     "x2": 42.577,
+     "y2": 23.7493,
+     "largo": 2.82,
+     "espesor": 0.25
+    },
+    {
+     "x1": 42.577,
+     "y1": 24.0493,
+     "x2": 42.577,
+     "y2": 26.7293,
+     "largo": 2.68,
+     "espesor": 0.25
+    },
+    {
+     "x1": 40.057,
+     "y1": 23.8993,
+     "x2": 42.452,
+     "y2": 23.8993,
+     "largo": 2.395,
+     "espesor": 0.3
+    },
+    {
+     "x1": 11.502,
+     "y1": 10.9293,
+     "x2": 12.952,
+     "y2": 10.9293,
+     "largo": 1.45,
+     "espesor": 0.3
+    },
+    {
+     "x1": 11.502,
+     "y1": 27.0793,
+     "x2": 12.952,
+     "y2": 27.0793,
+     "largo": 1.45,
+     "espesor": 0.3
+    }
+   ],
+   "pilares": [
+    {
+     "x": 22.352,
+     "y": 10.9293,
+     "b": 0.7,
+     "h": 0.7,
+     "etiqueta": "70x70",
+     "contorno_cerrado": true
+    },
+    {
+     "x": 32.352,
+     "y": 10.9293,
+     "b": 0.7,
+     "h": 0.7,
+     "etiqueta": "70x70",
+     "contorno_cerrado": true
+    },
+    {
+     "x": 14.852,
+     "y": 18.1793,
+     "b": 0.7,
+     "h": 0.7,
+     "etiqueta": "70x70",
+     "contorno_cerrado": true
+    },
+    {
+     "x": 22.352,
+     "y": 18.1793,
+     "b": 0.7,
+     "h": 0.7,
+     "etiqueta": "70x70",
+     "contorno_cerrado": true
+    },
+    {
+     "x": 32.352,
+     "y": 18.1793,
+     "b": 0.7,
+     "h": 0.7,
+     "etiqueta": "70x70",
+     "contorno_cerrado": true
+    },
+    {
+     "x": 22.352,
+     "y": 27.0793,
+     "b": 0.7,
+     "h": 0.7,
+     "etiqueta": "70x70",
+     "contorno_cerrado": true
+    },
+    {
+     "x": 32.352,
+     "y": 27.0793,
+     "b": 0.7,
+     "h": 0.7,
+     "etiqueta": "70x70",
+     "contorno_cerrado": true
+    },
+    {
+     "x": 42.352,
+     "y": 27.0793,
+     "b": 0.7,
+     "h": 0.7,
+     "etiqueta": "70x70",
+     "contorno_cerrado": false
+    }
+   ],
+   "vigas": [
+    {
+     "x1": 27.352,
+     "y1": 11.2293,
+     "x2": 27.352,
+     "y2": 26.7793,
+     "largo": 15.55,
+     "ancho": 0.6,
+     "alto": 0.8,
+     "etiqueta": "V. 60/80"
+    },
+    {
+     "x1": 37.352,
+     "y1": 11.2293,
+     "x2": 37.352,
+     "y2": 26.7793,
+     "largo": 15.55,
+     "ancho": 0.6,
+     "alto": 0.8,
+     "etiqueta": "V. 60/80"
+    },
+    {
+     "x1": 22.352,
+     "y1": 11.2793,
+     "x2": 22.352,
+     "y2": 26.7293,
+     "largo": 15.45,
+     "ancho": 0.6,
+     "alto": 0.8,
+     "etiqueta": "V. 60/80"
+    },
+    {
+     "x1": 32.352,
+     "y1": 11.2793,
+     "x2": 32.352,
+     "y2": 26.7293,
+     "largo": 15.45,
+     "ancho": 0.6,
+     "alto": 0.8,
+     "etiqueta": "V. 60/80"
+    },
+    {
+     "x1": 11.302,
+     "y1": 12.7543,
+     "x2": 11.302,
+     "y2": 25.2543,
+     "largo": 12.5,
+     "ancho": 0.4,
+     "alto": 0.8,
+     "etiqueta": "V. 40/80"
+    },
+    {
+     "x1": 15.202,
+     "y1": 18.1793,
+     "x2": 42.452,
+     "y2": 18.1793,
+     "largo": 27.25,
+     "ancho": 0.6,
+     "alto": 0.8,
+     "etiqueta": "V. 60/80"
+    },
+    {
+     "x1": 12.952,
+     "y1": 10.9293,
+     "x2": 42.452,
+     "y2": 10.9293,
+     "largo": 29.5,
+     "ancho": 0.6,
+     "alto": 0.8,
+     "etiqueta": "V. 60/80"
+    },
+    {
+     "x1": 12.952,
+     "y1": 27.0793,
+     "x2": 42.002,
+     "y2": 27.0793,
+     "largo": 29.05,
+     "ancho": 0.6,
+     "alto": 0.8,
+     "etiqueta": "V. 60/80"
+    },
+    {
+     "x1": 18.602,
+     "y1": 11.2293,
+     "x2": 18.602,
+     "y2": 26.7793,
+     "largo": 15.55,
+     "ancho": 0.6,
+     "alto": 0.8,
+     "etiqueta": "V. 60/80"
+    },
+    {
+     "x1": 14.852,
+     "y1": 11.2293,
+     "x2": 14.852,
+     "y2": 26.7793,
+     "largo": 15.55,
+     "ancho": 0.6,
+     "alto": 0.8,
+     "etiqueta": "V. 60/80"
+    },
+    {
+     "x1": 11.502,
+     "y1": 15.1943,
+     "x2": 18.302,
+     "y2": 15.1943,
+     "largo": 6.8,
+     "ancho": 0.3,
+     "alto": 0.8,
+     "etiqueta": "V. 30/80"
+    },
+    {
+     "x1": 11.502,
+     "y1": 22.8143,
+     "x2": 18.302,
+     "y2": 22.8143,
+     "largo": 6.8,
+     "ancho": 0.3,
+     "alto": 0.8,
+     "etiqueta": "V. 30/80"
+    }
+   ],
+   "auditoria": {
+    "ejes": {
+     "burbujas_leidas": 28,
+     "ejes_resueltos": 18,
+     "ejes_X": 10,
+     "ejes_Y": 8,
+     "sin_linea_de_apoyo": [
+      "E'"
+     ],
+     "clasificados_por_linea": [
+      {
+       "nombre": "E1",
+       "direccion": "X"
+      },
+      {
+       "nombre": "B'",
+       "direccion": "X"
+      }
+     ],
+     "burbujas_ambiguas": [],
+     "burbujas_sin_clasificar": [],
+     "rieles_x": [
+      7.286,
+      46.436
+     ],
+     "rieles_y": [
+      6.273,
+      31.973
+     ]
+    },
+    "alineacion_de_ejes": {
+     "aplicado": true,
+     "tolerancia_m": 0.2,
+     "elementos_movidos": 4,
+     "corrimiento_maximo_m": 0.15,
+     "detalle": [
+      {
+       "tipo": "muro",
+       "corrimiento_m": -0.1,
+       "largo_m": 2.92,
+       "se_alineo_con": "viga de 12.50 m"
+      },
+      {
+       "tipo": "muro",
+       "corrimiento_m": -0.1,
+       "largo_m": 2.92,
+       "se_alineo_con": "viga de 12.50 m"
+      },
+      {
+       "tipo": "muro",
+       "corrimiento_m": 0.15,
+       "largo_m": 1.45,
+       "se_alineo_con": "viga de 29.50 m"
+      },
+      {
+       "tipo": "muro",
+       "corrimiento_m": -0.15,
+       "largo_m": 1.45,
+       "se_alineo_con": "viga de 29.05 m"
+      }
+     ]
+    },
+    "muros": {
+     "segmentos_en_la_capa": 27,
+     "fusion_de_rectas": {
+      "entraron": 29,
+      "salieron": 27,
+      "fusiones": 0,
+      "puentes_sobre_un_cruce": 2,
+      "huecos_puenteados": [
+       0.3,
+       0.3
+      ]
+     },
+     "descartados_por_cortos": 10,
+     "caras_consideradas": 17,
+     "muros_emparejados": 9,
+     "caras_sin_pareja": 0,
+     "caras_sin_pareja_largos": [],
+     "tramos_rechazados_por_ocupado": 0,
+     "largo_total_caras": 55.65,
+     "largo_de_cara_emparejado": 54.8,
+     "cobertura": 0.9847,
+     "largo_total_muros": 27.4,
+     "espesores": [
+      [
+       0.25,
+       4
+      ],
+      [
+       0.3,
+       3
+      ],
+      [
+       0.6,
+       2
+      ]
+     ],
+     "descartados_fuera_de_la_ventana": 21
+    },
+    "pilares": {
+     "segmentos_en_la_capa": 32,
+     "grupos_encontrados": 8,
+     "pilares": 8,
+     "grupos_no_rectangulares": [],
+     "rectangulos_fuera_de_rango": [],
+     "con_etiqueta": 8,
+     "contorno_abierto": [
+      {
+       "centro": [
+        42.352,
+        27.079
+       ],
+       "seccion": [
+        0.7,
+        0.7
+       ]
+      }
+     ],
+     "etiqueta_no_calza_con_el_dibujo": [],
+     "secciones": [
+      [
+       "0.70x0.70",
+       8
+      ]
+     ],
+     "descartados_fuera_de_la_ventana": 0
+    },
+    "vigas": {
+     "segmentos_en_la_capa": 75,
+     "fusion_de_rectas": {
+      "entraron": 90,
+      "salieron": 75,
+      "fusiones": 15,
+      "puentes_sobre_un_cruce": 0,
+      "huecos_puenteados": []
+     },
+     "descartados_por_cortos": 1,
+     "caras_consideradas": 74,
+     "muros_emparejados": 43,
+     "caras_sin_pareja": 0,
+     "caras_sin_pareja_largos": [],
+     "tramos_rechazados_por_ocupado": 0,
+     "largo_total_caras": 383.5,
+     "largo_de_cara_emparejado": 374.6,
+     "cobertura": 0.9768,
+     "largo_total_muros": 187.3,
+     "espesores": [
+      [
+       0.3,
+       4
+      ],
+      [
+       0.4,
+       3
+      ],
+      [
+       0.6,
+       36
+      ]
+     ],
+     "vigas": 12,
+     "con_etiqueta": 12,
+     "sin_alto": 0,
+     "ancho_no_calza_con_la_etiqueta": [],
+     "secciones": [
+      [
+       "0.30/0.80",
+       2
+      ],
+      [
+       "0.40/0.80",
+       1
+      ],
+      [
+       "0.60/0.80",
+       9
+      ]
+     ],
+     "largo_total_vigas": 205.0,
+     "union_de_trozos": {
+      "entraron": 43,
+      "salieron": 12,
+      "uniones": 31
+     },
+     "descartados_fuera_de_la_ventana": 7
+    }
+   }
+  },
+  "2024_22-102": {
+   "papel": "planta_cielo_4",
+   "registro": {
+    "dx": -0.0,
+    "dy": -3.2,
+    "residuo_max": 0.0,
+    "ok": true,
+    "ejes_usados_x": [
+     "A",
+     "A'",
+     "B",
+     "C",
+     "C'",
+     "D",
+     "D'",
+     "E'"
+    ],
+    "ejes_usados_y": [
+     "1",
+     "1'",
+     "1A'",
+     "2",
+     "2A'",
+     "3"
+    ]
+   },
+   "ejes": {
+    "X": [
+     {
+      "nombre": "A'",
+      "coord": 10.9648
+     },
+     {
+      "nombre": "A",
+      "coord": 14.7446
+     },
+     {
+      "nombre": "B",
+      "coord": 22.2446
+     },
+     {
+      "nombre": "C",
+      "coord": 32.2363
+     },
+     {
+      "nombre": "C'",
+      "coord": 39.7866
+     },
+     {
+      "nombre": "D",
+      "coord": 42.2363
+     },
+     {
+      "nombre": "D'",
+      "coord": 42.9191
+     },
+     {
+      "nombre": "E'",
+      "coord": 43.7471
+     }
+    ],
+    "Y": [
+     {
+      "nombre": "3",
+      "coord": 11.047
+     },
+     {
+      "nombre": "2A'",
+      "coord": 15.312
+     },
+     {
+      "nombre": "2",
+      "coord": 18.297
+     },
+     {
+      "nombre": "1A'",
+      "coord": 22.932
+     },
+     {
+      "nombre": "1'",
+      "coord": 23.9918
+     },
+     {
+      "nombre": "1",
+      "coord": 27.197
+     }
+    ]
+   },
+   "muros": [
+    {
+     "x1": 42.577,
+     "y1": 10.5793,
+     "x2": 42.577,
+     "y2": 18.5293,
+     "largo": 7.95,
+     "espesor": 0.25
+    },
+    {
+     "x1": 11.302,
+     "y1": 25.2543,
+     "x2": 11.302,
+     "y2": 28.1743,
+     "largo": 2.92,
+     "espesor": 0.6
+    },
+    {
+     "x1": 11.302,
+     "y1": 9.8393,
+     "x2": 11.302,
+     "y2": 12.7543,
+     "largo": 2.915,
+     "espesor": 0.6
+    },
+    {
+     "x1": 39.932,
+     "y1": 20.9292,
+     "x2": 39.932,
+     "y2": 23.7493,
+     "largo": 2.8202,
+     "espesor": 0.25
+    },
+    {
+     "x1": 42.577,
+     "y1": 20.9293,
+     "x2": 42.577,
+     "y2": 23.7493,
+     "largo": 2.82,
+     "espesor": 0.25
+    },
+    {
+     "x1": 40.057,
+     "y1": 23.8993,
+     "x2": 42.452,
+     "y2": 23.8993,
+     "largo": 2.395,
+     "espesor": 0.3
+    },
+    {
+     "x1": 11.502,
+     "y1": 10.9293,
+     "x2": 12.952,
+     "y2": 10.9293,
+     "largo": 1.45,
+     "espesor": 0.3
+    },
+    {
+     "x1": 11.502,
+     "y1": 27.0793,
+     "x2": 12.952,
+     "y2": 27.0793,
+     "largo": 1.45,
+     "espesor": 0.3
+    }
+   ],
+   "pilares": [
+    {
+     "x": 22.352,
+     "y": 10.9293,
+     "b": 0.7,
+     "h": 0.7,
+     "etiqueta": "70x70",
+     "contorno_cerrado": true
+    },
+    {
+     "x": 32.352,
+     "y": 10.9293,
+     "b": 0.7,
+     "h": 0.7,
+     "etiqueta": "70x70",
+     "contorno_cerrado": true
+    },
+    {
+     "x": 14.852,
+     "y": 18.1793,
+     "b": 0.7,
+     "h": 0.7,
+     "etiqueta": "70x70",
+     "contorno_cerrado": true
+    },
+    {
+     "x": 22.352,
+     "y": 18.1793,
+     "b": 0.7,
+     "h": 0.7,
+     "etiqueta": "+V.I. 15/70 (2° ETAPA)",
+     "contorno_cerrado": true
+    },
+    {
+     "x": 32.352,
+     "y": 18.1793,
+     "b": 0.7,
+     "h": 0.7,
+     "etiqueta": "70x70",
+     "contorno_cerrado": true
+    },
+    {
+     "x": 22.352,
+     "y": 27.0793,
+     "b": 0.7,
+     "h": 0.7,
+     "etiqueta": "70x70",
+     "contorno_cerrado": true
+    },
+    {
+     "x": 32.352,
+     "y": 27.0793,
+     "b": 0.7,
+     "h": 0.7,
+     "etiqueta": "70x70",
+     "contorno_cerrado": true
+    },
+    {
+     "x": 42.352,
+     "y": 27.0793,
+     "b": 0.7,
+     "h": 0.7,
+     "etiqueta": "70x70",
+     "contorno_cerrado": true
+    }
+   ],
+   "vigas": [
+    {
+     "x1": 27.352,
+     "y1": 11.2293,
+     "x2": 27.352,
+     "y2": 26.7793,
+     "largo": 15.55,
+     "ancho": 0.6,
+     "alto": 0.8,
+     "etiqueta": "V. 60/80"
+    },
+    {
+     "x1": 37.352,
+     "y1": 11.2293,
+     "x2": 37.352,
+     "y2": 26.7793,
+     "largo": 15.55,
+     "ancho": 0.6,
+     "alto": 0.8,
+     "etiqueta": "V. 60/80"
+    },
+    {
+     "x1": 22.352,
+     "y1": 11.2793,
+     "x2": 22.352,
+     "y2": 26.7293,
+     "largo": 15.45,
+     "ancho": 0.6,
+     "alto": 0.8,
+     "etiqueta": "V. 60/80"
+    },
+    {
+     "x1": 32.352,
+     "y1": 11.2793,
+     "x2": 32.352,
+     "y2": 26.7293,
+     "largo": 15.45,
+     "ancho": 0.6,
+     "alto": 0.8,
+     "etiqueta": "V. 60/80"
+    },
+    {
+     "x1": 11.302,
+     "y1": 12.7543,
+     "x2": 11.302,
+     "y2": 25.1633,
+     "largo": 12.4089,
+     "ancho": 0.4,
+     "alto": 0.8,
+     "etiqueta": "V. 40/80"
+    },
+    {
+     "x1": 15.202,
+     "y1": 18.1793,
+     "x2": 42.452,
+     "y2": 18.1793,
+     "largo": 27.25,
+     "ancho": 0.6,
+     "alto": 0.8,
+     "etiqueta": "V. 60/80"
+    },
+    {
+     "x1": 12.952,
+     "y1": 10.9293,
+     "x2": 42.452,
+     "y2": 10.9293,
+     "largo": 29.5,
+     "ancho": 0.6,
+     "alto": 0.8,
+     "etiqueta": "V. 60/80"
+    },
+    {
+     "x1": 12.952,
+     "y1": 27.0793,
+     "x2": 42.002,
+     "y2": 27.0793,
+     "largo": 29.05,
+     "ancho": 0.6,
+     "alto": 0.8,
+     "etiqueta": "V. 60/80"
+    },
+    {
+     "x1": 18.602,
+     "y1": 11.2293,
+     "x2": 18.602,
+     "y2": 26.7793,
+     "largo": 15.55,
+     "ancho": 0.6,
+     "alto": 0.8,
+     "etiqueta": "V. 60/80"
+    },
+    {
+     "x1": 14.852,
+     "y1": 11.2293,
+     "x2": 14.852,
+     "y2": 26.7793,
+     "largo": 15.55,
+     "ancho": 0.6,
+     "alto": 0.8,
+     "etiqueta": "V. 60/80"
+    },
+    {
+     "x1": 11.502,
+     "y1": 15.1943,
+     "x2": 18.302,
+     "y2": 15.1943,
+     "largo": 6.8,
+     "ancho": 0.3,
+     "alto": 0.8,
+     "etiqueta": "V. 30/80"
+    },
+    {
+     "x1": 11.502,
+     "y1": 22.8143,
+     "x2": 18.302,
+     "y2": 22.8143,
+     "largo": 6.8,
+     "ancho": 0.3,
+     "alto": 0.8,
+     "etiqueta": "V. 30/80"
+    }
+   ],
+   "auditoria": {
+    "ejes": {
+     "burbujas_leidas": 24,
+     "ejes_resueltos": 14,
+     "ejes_X": 8,
+     "ejes_Y": 6,
+     "sin_linea_de_apoyo": [
+      "E'"
+     ],
+     "clasificados_por_linea": [],
+     "burbujas_ambiguas": [],
+     "burbujas_sin_clasificar": [],
+     "rieles_x": [
+      7.286,
+      45.936
+     ],
+     "rieles_y": [
+      9.473,
+      35.173
+     ]
+    },
+    "alineacion_de_ejes": {
+     "aplicado": true,
+     "tolerancia_m": 0.2,
+     "elementos_movidos": 4,
+     "corrimiento_maximo_m": 0.15,
+     "detalle": [
+      {
+       "tipo": "muro",
+       "corrimiento_m": -0.1,
+       "largo_m": 2.92,
+       "se_alineo_con": "viga de 12.41 m"
+      },
+      {
+       "tipo": "muro",
+       "corrimiento_m": -0.1,
+       "largo_m": 2.92,
+       "se_alineo_con": "viga de 12.41 m"
+      },
+      {
+       "tipo": "muro",
+       "corrimiento_m": 0.15,
+       "largo_m": 1.45,
+       "se_alineo_con": "viga de 29.50 m"
+      },
+      {
+       "tipo": "muro",
+       "corrimiento_m": -0.15,
+       "largo_m": 1.45,
+       "se_alineo_con": "viga de 29.05 m"
+      }
+     ]
+    },
+    "muros": {
+     "segmentos_en_la_capa": 26,
+     "fusion_de_rectas": {
+      "entraron": 28,
+      "salieron": 26,
+      "fusiones": 0,
+      "puentes_sobre_un_cruce": 2,
+      "huecos_puenteados": [
+       0.3,
+       0.3
+      ]
+     },
+     "descartados_por_cortos": 10,
+     "caras_consideradas": 16,
+     "muros_emparejados": 8,
+     "caras_sin_pareja": 0,
+     "caras_sin_pareja_largos": [],
+     "tramos_rechazados_por_ocupado": 0,
+     "largo_total_caras": 50.54,
+     "largo_de_cara_emparejado": 49.44,
+     "cobertura": 0.9782,
+     "largo_total_muros": 24.72,
+     "espesores": [
+      [
+       0.25,
+       3
+      ],
+      [
+       0.3,
+       3
+      ],
+      [
+       0.6,
+       2
+      ]
+     ],
+     "descartados_fuera_de_la_ventana": 3
+    },
+    "pilares": {
+     "segmentos_en_la_capa": 32,
+     "grupos_encontrados": 8,
+     "pilares": 8,
+     "grupos_no_rectangulares": [],
+     "rectangulos_fuera_de_rango": [],
+     "con_etiqueta": 8,
+     "contorno_abierto": [],
+     "etiqueta_no_calza_con_el_dibujo": [
+      {
+       "centro": [
+        22.352,
+        18.179
+       ],
+       "medido": [
+        0.7,
+        0.7
+       ],
+       "etiqueta": "+V.I. 15/70 (2° ETAPA)"
+      }
+     ],
+     "secciones": [
+      [
+       "0.70x0.70",
+       8
+      ]
+     ],
+     "descartados_fuera_de_la_ventana": 12
+    },
+    "vigas": {
+     "segmentos_en_la_capa": 79,
+     "fusion_de_rectas": {
+      "entraron": 160,
+      "salieron": 79,
+      "fusiones": 81,
+      "puentes_sobre_un_cruce": 0,
+      "huecos_puenteados": []
+     },
+     "descartados_por_cortos": 1,
+     "caras_consideradas": 78,
+     "muros_emparejados": 45,
+     "caras_sin_pareja": 0,
+     "caras_sin_pareja_largos": [],
+     "tramos_rechazados_por_ocupado": 0,
+     "largo_total_caras": 380.21,
+     "largo_de_cara_emparejado": 371.22,
+     "cobertura": 0.9764,
+     "largo_total_muros": 185.61,
+     "espesores": [
+      [
+       0.3,
+       4
+      ],
+      [
+       0.4,
+       3
+      ],
+      [
+       0.6,
+       38
+      ]
+     ],
+     "vigas": 12,
+     "con_etiqueta": 12,
+     "sin_alto": 0,
+     "ancho_no_calza_con_la_etiqueta": [],
+     "secciones": [
+      [
+       "0.30/0.80",
+       2
+      ],
+      [
+       "0.40/0.80",
+       1
+      ],
+      [
+       "0.60/0.80",
+       9
+      ]
+     ],
+     "largo_total_vigas": 204.91,
+     "union_de_trozos": {
+      "entraron": 45,
+      "salieron": 12,
+      "uniones": 33
+     },
+     "descartados_fuera_de_la_ventana": 12
+    }
+   }
+  }
+ },
+ "losas": {
+  "panos": [
+   {
+    "nombre": "0100",
+    "espesor": 0.15,
+    "x": 18.995,
+    "y": 27.947
+   },
+   {
+    "nombre": "0101",
+    "espesor": 0.15,
+    "x": 12.71,
+    "y": 24.96
+   },
+   {
+    "nombre": "0102",
+    "espesor": 0.15,
+    "x": 16.582,
+    "y": 24.354
+   },
+   {
+    "nombre": "0103",
+    "espesor": 0.15,
+    "x": 20.454,
+    "y": 22.335
+   },
+   {
+    "nombre": "0104",
+    "espesor": 0.15,
+    "x": 29.501,
+    "y": 27.96
+   },
+   {
+    "nombre": "0105",
+    "espesor": 0.15,
+    "x": 24.76,
+    "y": 22.335
+   },
+   {
+    "nombre": "0106",
+    "espesor": 0.15,
+    "x": 29.766,
+    "y": 22.335
+   },
+   {
+    "nombre": "0107",
+    "espesor": 0.15,
+    "x": 39.013,
+    "y": 27.959
+   },
+   {
+    "nombre": "0108",
+    "espesor": 0.15,
+    "x": 34.75,
+    "y": 22.335
+   },
+   {
+    "nombre": "0109",
+    "espesor": 0.15,
+    "x": 40.032,
+    "y": 26.019
+   },
+   {
+    "nombre": "0110",
+    "espesor": 0.15,
+    "x": 38.932,
+    "y": 22.176
+   },
+   {
+    "nombre": "0111",
+    "espesor": 0.15,
+    "x": 41.3,
+    "y": 19.878
+   },
+   {
+    "nombre": "0112",
+    "espesor": 0.15,
+    "x": 13.524,
+    "y": 18.718
+   },
+   {
+    "nombre": "0113",
+    "espesor": 0.15,
+    "x": 16.33,
+    "y": 20.877
+   },
+   {
+    "nombre": "0114",
+    "espesor": 0.15,
+    "x": 13.254,
+    "y": 12.743
+   },
+   {
+    "nombre": "0115",
+    "espesor": 0.15,
+    "x": 16.701,
+    "y": 13.517
+   },
+   {
+    "nombre": "0116",
+    "espesor": 0.15,
+    "x": 16.536,
+    "y": 16.296
+   },
+   {
+    "nombre": "0117",
+    "espesor": 0.15,
+    "x": 20.386,
+    "y": 14.9
+   },
+   {
+    "nombre": "0118",
+    "espesor": 0.15,
+    "x": 24.686,
+    "y": 14.9
+   },
+   {
+    "nombre": "0119",
+    "espesor": 0.15,
+    "x": 29.595,
+    "y": 14.9
+   },
+   {
+    "nombre": "0120",
+    "espesor": 0.15,
+    "x": 34.537,
+    "y": 15.046
+   },
+   {
+    "nombre": "0121",
+    "espesor": 0.15,
+    "x": 40.01,
+    "y": 15.003
+   }
+  ],
+  "auditoria": {
+   "bloque": "losa-ne",
+   "tag_espesor": "ESP",
+   "panos": 22,
+   "rotulos_sin_espesor_legible": 0,
+   "espesores": [
+    [
+     0.15,
+     22
+    ]
+   ],
+   "espesor_unico": true,
+   "espesor_dominante": 0.15
+  }
+ },
+ "perfil_dinteles": [
+  {
+   "nombre": "acceso a la caja de ascensores",
+   "viga": {
+    "x1": 39.932,
+    "y1": 20.929,
+    "x2": 42.577,
+    "y2": 20.929,
+    "ancho": 0.25,
+    "alto": 0.8,
+    "etiqueta": "dintel supuesto"
+   },
+   "ancho_del_vano_m": 2.645,
+   "_por_que": "La caja de ascensores queda ABIERTA por el sur: tres muros en U y el cuarto lado es el acceso. Sin nada que cierre ese vano, el borde de la losa entra en la caja y vuelve a salir; el pano se recorre como una RANURA, con sus aristas repetidas, y el reparto a 45 grados se rompe (los poligonos sumaban 174 m2 sobre un pano de 45.6 m2). Con el dintel, la caja queda cerrada y el pano de afuera es un poligono simple con una muesca."
+  },
+  {
+   "nombre": "vano de la fachada oriente",
+   "viga": {
+    "x1": 42.577,
+    "y1": 18.529,
+    "x2": 42.577,
+    "y2": 20.929,
+    "ancho": 0.25,
+    "alto": 0.8,
+    "etiqueta": "dintel supuesto"
+   },
+   "ancho_del_vano_m": 2.4,
+   "_por_que": "El muro de fachada del eje D viene partido: 10.58-18.53 y 20.93-23.75. Entre medio hay 2.40 m de vano (el pasillo). Sin nada ahi, el bloque nororiente entero --45 m2 por piso-- no cierra como pano y su carga no llega a ninguna viga."
+  }
+ ],
+ "materiales": {
+  "hormigon": {
+   "designacion": "G35_10",
+   "fc_MPa": 35.0,
+   "poisson": 0.2,
+   "peso_especifico_kNm3": 25.0,
+   "_fuente": "Nota de la lamina 2024_22-100 (PLANTA FUNDACIONES): 'HORMIGON G35_10: (Desde fundaciones A Cielo piso 4) - RESISTENCIA A COMPRESION PROBETA CILINDRICA FC' = 35 MPA, EQUIVALENTE A RESISTENCIA A COMPRESION PROBETA CUBICA R28 = 40 MPA'. El G20_10 que tambien aparece es para el radier armado, no estructural.",
+   "_codigo": "La lamina 000 declara diseno segun A.C.I. 318-08."
+  }
+ },
+ "cargas": {
+  "_fuente": "Lamina 2024_22-700, PLANO DE CARGAS. Trae dos bloques 'CARGAS DE DISENO', uno por cada planta de cargas. Las unidades del plano son kgf/m2; se convierten con g = 9.80665 m/s2.",
+  "g_ms2": 9.80665,
+  "peso_propio_losa": "e(m) x 2500 kgf/m3 segun el plano. El modelo usa gamma = 25 kN/m3 (2 % mas), que es el valor estandar de hormigon armado y el que ya usaba el proyecto.",
+  "por_lamina": {
+   "2024_22-101": {
+    "_titulo_en_el_plano": "PLANTA CARGAS CIELO 1 SUBTERRANEO a CIELO PISO 3",
+    "sobrecarga_kgf_m2": 500,
+    "peso_muerto_adicional_kgf_m2": 260
+   },
+   "2024_22-102": {
+    "_titulo_en_el_plano": "PLANTA CARGAS CIELO PISO 4",
+    "sobrecarga_kgf_m2": 300,
+    "peso_muerto_adicional_kgf_m2": 200
+   }
+  },
+  "_no_modelado": "El mismo plano trae un bloque de CARGA LINEAL (SC = 100 y 200 kgf/m, PM. ADIC. = 1500 kgf/m) para tabiques y antepechos sobre vigas. No esta en el modelo todavia."
+ },
+ "niveles_del_modelo": {
+  "_como_se_dedujo": "De los TITULOS de las laminas: la 101 dice 'PLANTA CIELO 1 SUBTERRANEO a CIELO PISO 3', o sea que la misma planta se repite en cuatro cielos; la 102 dice 'PLANTA CIELO 4 PISO'. Cruzado con las 7 cotas que confirman las 6 elevaciones, el reparto es este.",
+  "base": -7.97,
+  "_base_por_que": "-8.57 es el sello de fundacion (el fondo de la zapata) y -7.97 el nivel de piso del subterraneo. Los apoyos van en -7.97: es la simplificacion habitual de empotrar en el sello superior de la fundacion, y la lamina de fundaciones esta dibujada para ese nivel.",
+  "pisos": [
+   {
+    "z": -4.01,
+    "lamina": "2024_22-101",
+    "nombre": "cielo 1 subterraneo"
+   },
+   {
+    "z": -0.05,
+    "lamina": "2024_22-101",
+    "nombre": "cielo piso 1"
+   },
+   {
+    "z": 3.91,
+    "lamina": "2024_22-101",
+    "nombre": "cielo piso 2"
+   },
+   {
+    "z": 7.87,
+    "lamina": "2024_22-101",
+    "nombre": "cielo piso 3"
+   },
+   {
+    "z": 11.83,
+    "lamina": "2024_22-102",
+    "nombre": "cielo piso 4"
+   }
+  ]
+ }
+}

@@ -30,14 +30,19 @@ r"""
  encontrar los panos), que vive en el repo `A1P1.0_Grupo_7`.
 
  ----------------------------------------------------------------
- POR QUE UN ADAPTADOR Y NO UNA COPIA
+ POR QUE UN ADAPTADOR
  ----------------------------------------------------------------
  Este archivo NO reimplementa el LT2: lo IMPORTA y le pone encima la
- misma interfaz que el laboratorio ya usaba. Asi hay UNA sola copia
- del modelo. La alternativa --copiar `modelo_lt2.py`, `malla.py`,
- `panos.py` y el ingestor aca-- daria un lab autocontenido, pero dos
- copias de un modelo que sigue cambiando: divergen a la semana y
- despues nadie sabe cual es la buena.
+ misma interfaz que el laboratorio ya usaba.
+
+ El modelo se DESARROLLA en el repo A1P1.0_Grupo_7 (ahi esta el
+ ingestor de planos y sus tests) y de ahi se COPIA a `src/` de este
+ repo. Se copia y no se referencia porque el laboratorio tiene que
+ entregarse solo: quien clone este repositorio debe poder correrlo
+ sin bajar nada mas.
+
+ Para iterar contra la copia de A1P1.0 sin sincronizar cada vez:
+     $env:LT2_SRC = "C:\ruta\a\A1P1.0_Grupo_7\src"
 
  Lo que el laboratorio conserva sin cambios: el notebook y sus
  secciones, las 5 verificaciones, el contrato JSON, el visor de
@@ -87,27 +92,28 @@ _RAIZ = os.path.dirname(_AQUI)
 # ============================================================
 def _ruta_del_lt2():
     """
-    Encuentra `src/` del repo A1P1.0_Grupo_7, que es donde vive el
-    modelo del LT2.
+    Encuentra el modulo del modelo del LT2.
 
-    Se busca al lado de este repo, que es como estan las dos carpetas.
-    Si se mueve, se declara en la variable de entorno LT2_SRC; asi no
-    hay que editar codigo para reubicarlo.
+    Primero busca la copia que vive en ESTE repo (src/modelo_lt2.py).
+    El laboratorio se entrega solo: quien clone este repositorio tiene
+    que poder correrlo sin bajar nada mas.
+
+    El modelo se desarrolla en el repo A1P1.0_Grupo_7 y de ahi se
+    copia. Si se quiere trabajar contra ESA copia --para no tener que
+    sincronizar mientras se itera-- se declara su ruta en la variable
+    de entorno LT2_SRC y manda esa.
     """
     declarada = os.environ.get('LT2_SRC')
     candidatas = ([declarada] if declarada else []) + [
+        _AQUI,                                          # la copia local
         os.path.join(os.path.dirname(_RAIZ), 'A1P1.0_Grupo_7', 'src'),
-        os.path.join(_RAIZ, '..', 'A1P1.0_Grupo_7', 'src'),
     ]
     for c in candidatas:
         if c and os.path.isfile(os.path.join(c, 'modelo_lt2.py')):
             return os.path.abspath(c)
     raise RuntimeError(
-        'No encuentro el modelo del LT2 (src/modelo_lt2.py del repo '
-        'A1P1.0_Grupo_7). Se busco en:\n  ' +
-        '\n  '.join(str(c) for c in candidatas) +
-        '\nSi el repo esta en otra parte, declara la ruta con la variable '
-        'de entorno LT2_SRC.')
+        'No encuentro src/modelo_lt2.py. Se busco en:\n  ' +
+        '\n  '.join(str(c) for c in candidatas))
 
 
 LT2_SRC = _ruta_del_lt2()

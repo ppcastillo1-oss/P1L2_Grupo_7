@@ -1,0 +1,237 @@
+{
+ "nombre": "LT2 - Proyecto de calculo 2024_22 (M. Kupfer C., octubre 2024)",
+ "descripcion": "Edificio LT2. 1 subterraneo + 4 pisos. Planos de calculo entregados en DWG; se convierten a DXF con src/planos/dwg_a_dxf.ps1.",
+ "unidades": "cm",
+ "_nota_unidades": "El encabezado DXF declara $INSUNITS = 0 ('sin especificar'). La unidad real es el centimetro: la planta mide ~3900 x 3400 unidades, o sea 39 x 34 m. El inventario lo estima igual, pero aca queda declarado a proposito y no adivinado.",
+ "roles": {
+  "ejes_lineas": {
+   "capas": [
+    "RLE-EJES",
+    "RLE-EJES-AUXILIAR",
+    "RLA-EJES"
+   ],
+   "_que_es": "la linea larga del eje estructural"
+  },
+  "ejes_rotulos": {
+   "capas": [
+    "RLE-EJE"
+   ],
+   "_que_es": "la burbuja: un CIRCLE con un MTEXT adentro (A, A', 1, 8B...)"
+  },
+  "muros": {
+   "capas": [
+    "RLE-MURO"
+   ],
+   "_que_es": "muros de hormigon, dibujados como sus DOS CARAS paralelas",
+   "espesor_min": 0.1,
+   "espesor_max": 0.6,
+   "largo_min": 1.0,
+   "alinear_ejes_casi_colineales": 0.2,
+   "_alinear_ejes_casi_colineales": "Tolerancia para dar por colineales dos elementos paralelos y llevarlos al eje del mas largo. Una fachada no es un solo elemento: hay una viga de 0.60 de ancho a lo largo de casi todo el frente y, en las esquinas, un muro de 0.30. Comparten la CARA EXTERIOR del edificio (y=10.63 en el LT2) pero como tienen anchos distintos sus EJES quedan a 0.15 m. Cada uno en su eje, el perimetro sale en zigzag y las areas tributarias terminan en astillas diagonales en vez de angulo recto. Con 0.20 m se juntan los cuatro casos del LT2 (0.10 y 0.15 m) y no se toca nada mas: el elemento paralelo mas cercano que NO es fachada esta a mas de 1 m."
+  },
+  "pilares": {
+   "capas": [
+    "RLE-PILAR"
+   ],
+   "_que_es": "pilares, dibujados como el rectangulo de su seccion"
+  },
+  "vigas": {
+   "capas": [
+    "RLE-VIGA"
+   ],
+   "_que_es": "vigas, dibujadas como sus dos caras. El ANCHO se mide del dibujo; el ALTO se lee de la etiqueta ('V. 60/80' = 60 de ancho x 80 de alto) y el ancho medido se contrasta contra el rotulo.",
+   "ancho_min": 0.15,
+   "ancho_max": 1.2,
+   "largo_min": 1.0,
+   "gap_colineal": 2.5,
+   "_gap_colineal": "Hueco maximo para dar dos trozos dibujados por la MISMA viga. En estos planos la linea de la viga se corta donde hay una PASADA: la 102 rotula \"PASADA 45/30\" seis veces sobre las vigas de fachada, y el corte se lleva la pasada mas su rotulo -- huecos medidos de 1.72, 1.88, 1.98, 2.08, 2.23, 2.26 y 2.28 m. Una pasada es una perforacion de 45x30 cm por donde bajan ductos: NO interrumpe la viga. Con el valor por defecto (1.5 m) esos trozos quedaban sueltos y sus extremos terminaban en el aire, con 54 mm de flecha contra 2 mm de mediana del piso."
+  },
+  "losa": {
+   "capas": [
+    "RLE-LOSA",
+    "RLE-LOSAS",
+    "RLA-BORDE DE LOSAS",
+    "RLA-LOSA"
+   ],
+   "_que_es": "borde de losa / contorno del pano"
+  },
+  "vanos": {
+   "capas": [
+    "RLE-VANOS"
+   ],
+   "_que_es": "aberturas en muros y losas"
+  },
+  "fundacion": {
+   "capas": [
+    "RLE-FUNDACION"
+   ],
+   "_que_es": "zapatas y vigas de fundacion (solo en la lamina 100)"
+  },
+  "niveles": {
+   "capas": [
+    "RLE-NIVELES",
+    "RLA-NIVELES"
+   ],
+   "_que_es": "cotas de nivel (N.P.T., +3.96, ...)"
+  },
+  "etiquetas": {
+   "capas": [
+    "RLE-TEXTO-1",
+    "RLE-TEXTOS-1",
+    "RLE-TEXTOS-SM",
+    "TEXTOS-SM"
+   ],
+   "_que_es": "textos de seccion: 'P.70x70', 'V. 60/80', 'V.F. 20/120'"
+  },
+  "contorno_elevacion": {
+   "capas": [
+    "RLE-CONTORNO",
+    "RLE-CONTORNOS"
+   ],
+   "_que_es": "silueta de muros y vigas en las laminas de elevacion"
+  }
+ },
+ "hojas": {
+  "planta_fundaciones": "2024_22-100",
+  "planta_tipo": "2024_22-101",
+  "planta_cielo_4": "2024_22-102"
+ },
+ "ventana": {
+  "modo": "ejes_nombrados",
+  "xmin": {
+   "eje": "A'",
+   "margen": 0.6
+  },
+  "xmax": {
+   "coord": 42.75,
+   "_por_que": "Eje de la JUNTA DE DILATACION. No hay un eje con nombre ahi, pero el dibujo la marca solo: la cara este del LT2 esta en x=42.702 y la cara oeste del cuerpo vecino en x=42.802. Esos 10 cm son la junta que la lamina 700 rotula siete veces. Lo que queda al otro lado -- tres pilares en x=43.15 y sus vigas -- es la ETAPA ANTERIOR, rotulada asi en la 102 en (43.77, 16.61)."
+  },
+  "ymin": {
+   "eje": "3",
+   "margen": 1.5
+  },
+  "ymax": {
+   "eje": "1",
+   "margen": 1.5
+  },
+  "_margenes": "Las fachadas se doblan y sobresalen de su eje: la cara oeste llega a y=9.839 (1.21 m bajo el eje 3) y a y=28.174 (0.98 m sobre el eje 1). Con 1.50 m entran enteras. El bloque de la rampa empieza en y=33.40, o sea 4.7 m mas al norte: el margen no lo alcanza ni de cerca.",
+  "_que_deja_afuera": "Dos cuerpos que estas laminas dibujan y que NO son el edificio LT2. (1) La ETAPA ANTERIOR, al otro lado de la junta. (2) La RAMPA de acceso al subterraneo, entre los ejes 8A y 8B: sus rotulos dicen \"i=52.46%\" y \"i=52.62%\", \"N.S.M.=VAR\", \"N.O.G.=VAR\" y cotas -7.39, -6.97, -5.15, -4.73, -3.23, -2.81, todas de la elevacion 302 y ninguna de los pisos del edificio. Es una losa inclinada sobre muros de independencia que no pasa del subterraneo; la lamina de techo (102) ni siquiera tiene los ejes 8A y 8B. Modelada con la regla de continuidad vertical se convertia en cuatro torres de 20 m al lado del edificio.",
+  "_por_que_no_malla_de_ejes": "El modo malla_de_ejes recorta las VISTAS DE DETALLE que la lamina dibuja al lado, en las mismas capas. Eso sigue siendo util, pero no distingue un edificio de otro: la rampa y la etapa anterior tienen ejes propios y caian dentro de la malla."
+ },
+ "_no_es_una_planta": {
+  "2024_22-700": "PLANO DE CARGAS. Es un XREF de las laminas 101 y 102 puestas una al lado de la otra: sus ejes aparecen DOS VECES en posiciones distintas, asi que no se puede registrar contra la planta tipo (el registro daba dx=+4.996 contra el +5.000 de la lamina 100, y solo con 2 ejes en comun). Sirve para las cargas, no para la geometria."
+ },
+ "rotulos_de_losa": {
+  "bloque": "losa-ne",
+  "tag_espesor": "ESP",
+  "tag_nombre": "N%%DL",
+  "unidades_espesor": "cm",
+  "_evidencia": "22 bloques 'losa-ne' en la lamina 101 (panos 0100 a 0121), TODOS con ESP=15. El espesor de losa no se puede medir en planta: se lee del atributo del bloque, que tiene nombre y por lo tanto no hay que adivinar cual numero del plano es."
+ },
+ "materiales": {
+  "hormigon": {
+   "designacion": "G35_10",
+   "fc_MPa": 35.0,
+   "poisson": 0.2,
+   "peso_especifico_kNm3": 25.0,
+   "_fuente": "Nota de la lamina 2024_22-100 (PLANTA FUNDACIONES): 'HORMIGON G35_10: (Desde fundaciones A Cielo piso 4) - RESISTENCIA A COMPRESION PROBETA CILINDRICA FC' = 35 MPA, EQUIVALENTE A RESISTENCIA A COMPRESION PROBETA CUBICA R28 = 40 MPA'. El G20_10 que tambien aparece es para el radier armado, no estructural.",
+   "_codigo": "La lamina 000 declara diseno segun A.C.I. 318-08."
+  }
+ },
+ "cargas": {
+  "_fuente": "Lamina 2024_22-700, PLANO DE CARGAS. Trae dos bloques 'CARGAS DE DISENO', uno por cada planta de cargas. Las unidades del plano son kgf/m2; se convierten con g = 9.80665 m/s2.",
+  "g_ms2": 9.80665,
+  "peso_propio_losa": "e(m) x 2500 kgf/m3 segun el plano. El modelo usa gamma = 25 kN/m3 (2 % mas), que es el valor estandar de hormigon armado y el que ya usaba el proyecto.",
+  "por_lamina": {
+   "2024_22-101": {
+    "_titulo_en_el_plano": "PLANTA CARGAS CIELO 1 SUBTERRANEO a CIELO PISO 3",
+    "sobrecarga_kgf_m2": 500,
+    "peso_muerto_adicional_kgf_m2": 260
+   },
+   "2024_22-102": {
+    "_titulo_en_el_plano": "PLANTA CARGAS CIELO PISO 4",
+    "sobrecarga_kgf_m2": 300,
+    "peso_muerto_adicional_kgf_m2": 200
+   }
+  },
+  "_no_modelado": "El mismo plano trae un bloque de CARGA LINEAL (SC = 100 y 200 kgf/m, PM. ADIC. = 1500 kgf/m) para tabiques y antepechos sobre vigas. No esta en el modelo todavia."
+ },
+ "niveles_del_modelo": {
+  "_como_se_dedujo": "De los TITULOS de las laminas: la 101 dice 'PLANTA CIELO 1 SUBTERRANEO a CIELO PISO 3', o sea que la misma planta se repite en cuatro cielos; la 102 dice 'PLANTA CIELO 4 PISO'. Cruzado con las 7 cotas que confirman las 6 elevaciones, el reparto es este.",
+  "base": -7.97,
+  "_base_por_que": "-8.57 es el sello de fundacion (el fondo de la zapata) y -7.97 el nivel de piso del subterraneo. Los apoyos van en -7.97: es la simplificacion habitual de empotrar en el sello superior de la fundacion, y la lamina de fundaciones esta dibujada para ese nivel.",
+  "pisos": [
+   {
+    "z": -4.01,
+    "lamina": "2024_22-101",
+    "nombre": "cielo 1 subterraneo"
+   },
+   {
+    "z": -0.05,
+    "lamina": "2024_22-101",
+    "nombre": "cielo piso 1"
+   },
+   {
+    "z": 3.91,
+    "lamina": "2024_22-101",
+    "nombre": "cielo piso 2"
+   },
+   {
+    "z": 7.87,
+    "lamina": "2024_22-101",
+    "nombre": "cielo piso 3"
+   },
+   {
+    "z": 11.83,
+    "lamina": "2024_22-102",
+    "nombre": "cielo piso 4"
+   }
+  ]
+ },
+ "_junta_de_dilatacion": "La lamina 700 (plano de cargas) rotula 'JUNTA DE DILATACION 10 cm' siete veces, y las laminas 101 y 700 hablan de 'ETAPA ANTERIOR' y '2a ETAPA'. O sea que este cuerpo esta separado del vecino por una junta: al unir dos modelos NO deben compartir nodos.",
+ "elevaciones": [
+  "2024_22-300",
+  "2024_22-301",
+  "2024_22-302",
+  "2024_22-303",
+  "2024_22-304",
+  "2024_22-305"
+ ],
+ "_laminas_ignoradas": {
+  "2024_22-000/001/002": "detalles tipicos y simbologia, sin geometria del edificio",
+  "2024_22-2xx": "plantas de armadura (fierros); la geometria sale de las plantas 10x",
+  "2024_22-400": "vigas numericas (despiece)",
+  "2024_22-500/501": "escaleras"
+ },
+ "dinteles": [
+  {
+   "nombre": "acceso a la caja de ascensores",
+   "viga": {
+    "x1": 39.932,
+    "y1": 20.929,
+    "x2": 42.577,
+    "y2": 20.929,
+    "ancho": 0.25,
+    "alto": 0.8,
+    "etiqueta": "dintel supuesto"
+   },
+   "ancho_del_vano_m": 2.645,
+   "_por_que": "La caja de ascensores queda ABIERTA por el sur: tres muros en U y el cuarto lado es el acceso. Sin nada que cierre ese vano, el borde de la losa entra en la caja y vuelve a salir; el pano se recorre como una RANURA, con sus aristas repetidas, y el reparto a 45 grados se rompe (los poligonos sumaban 174 m2 sobre un pano de 45.6 m2). Con el dintel, la caja queda cerrada y el pano de afuera es un poligono simple con una muesca."
+  },
+  {
+   "nombre": "vano de la fachada oriente",
+   "viga": {
+    "x1": 42.577,
+    "y1": 18.529,
+    "x2": 42.577,
+    "y2": 20.929,
+    "ancho": 0.25,
+    "alto": 0.8,
+    "etiqueta": "dintel supuesto"
+   },
+   "ancho_del_vano_m": 2.4,
+   "_por_que": "El muro de fachada del eje D viene partido: 10.58-18.53 y 20.93-23.75. Entre medio hay 2.40 m de vano (el pasillo). Sin nada ahi, el bloque nororiente entero --45 m2 por piso-- no cierra como pano y su carga no llega a ninguna viga."
+  }
+ ],
+ "_dinteles_son_un_supuesto": "Las laminas NO dibujan estas dos vigas. Se declaran aca, con nombre y con el ancho del vano, para que aparezcan como supuesto en la auditoria del modelo y se puedan sacar cambiando SOLO este archivo, sin tocar codigo. Lo que si dibuja el plano son los muros a ambos lados de cada vano, y los rotulos de losa (0109, 0110, 0111) alrededor de ellos --ninguno cae DENTRO de la caja de ascensores, o sea que ahi no hay losa. Un vano de 2.4 a 2.6 m entre dos muros de hormigon lleva dintel: es lo habitual, y es lo conservador para el borde de la losa."
+}

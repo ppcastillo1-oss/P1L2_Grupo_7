@@ -16,15 +16,13 @@ r"""
  ----------------------------------------------------------------
  POR QUE ESTE ARCHIVO ES UN ENVOLTORIO
  ----------------------------------------------------------------
- La estructura del laboratorio es ahora el edificio LT2, cuyo modelo
- vive en el repo `A1P1.0_Grupo_7` (ver el encabezado de
- `modelo_edificio.py`). El exportador tambien: es el que sabe que
- campos pide el C# y con que convencion, y duplicarlo aca seria
- tener dos contratos que van a divergir.
+ El exportador de verdad es `src/exportar_lt2.py`: el que sabe que
+ campos pide el C# y con que convencion. Este archivo hace una sola
+ cosa: llamarlo y pedirle que escriba en `data/modelo_unity.json`,
+ que es donde el visor y los tests del laboratorio lo buscan.
 
- Asi que este archivo hace una sola cosa: llamar al exportador del
- LT2 y pedirle que escriba en el `data/` de ESTE repo, que es donde
- el visor y los tests del laboratorio lo buscan.
+ Se conserva este nombre porque es el que usan el notebook, el
+ README y la costumbre: `python src/exportar_unity.py`.
 
  Correr:  python src/exportar_unity.py
 ================================================================
@@ -43,14 +41,14 @@ import modelo_edificio as M                # noqa: E402  (resuelve LT2_SRC)
 
 sys.path.insert(0, M.LT2_SRC)
 
-import exportar_unity as _exportador_lt2   # noqa: E402
+import exportar_lt2 as _exportador_lt2      # noqa: E402
 
 SALIDA = os.path.join(_RAIZ, 'data', 'modelo_unity.json')
 
 
 def main():
     print('Estructura: edificio LT2 (planos de calculo 2024_22)')
-    print('Exportador: %s' % os.path.join(M.LT2_SRC, 'exportar_unity.py'))
+    print('Exportador: %s' % os.path.join(M.LT2_SRC, 'exportar_lt2.py'))
     print()
     return _exportador_lt2.main(SALIDA)
 

@@ -34,16 +34,19 @@ Grupo 7 — Pedro Castillo, Monserrat Cubillos, Eduardo Vergara.
 
 Las **5 verificaciones del Lab pasan**: `python verificar_lab2.py`
 
-### El modelo del LT2 vive en otro repo
+### El modelo del LT2
 
-La estructura la construye [`A1P1.0_Grupo_7`](https://github.com/bitscochits/A1P1.0_Grupo_7)
-(el ingestor de planos, el mallador y los paños). Este laboratorio lo **importa**,
-para que haya una sola copia del modelo. Se espera **al lado** de este repo; si
-está en otra parte:
+La estructura la construye `src/modelo_lt2.py` con `malla.py`, `panos.py` y el
+ingestor de planos `src/planos/`. El desarrollo de ese modelo vive en
+[A1P1.0_Grupo_7](https://github.com/bitscochits/A1P1.0_Grupo_7) y de ahi se
+**copia** a este repo: el laboratorio se entrega solo, asi que quien clone este
+repositorio puede correrlo sin bajar nada mas.
+
+Sus propias verificaciones tambien estan aca:
 
 ```powershell
-$env:LT2_SRC = "C:\ruta\a\A1P1.0_Grupo_7\src"
-uta\A1P1.0_Grupo_7\src"
+python verificar_lt2.py     # 36 checks del modelo del LT2
+python test_planos.py       # 51 checks del ingestor de planos
 ```
 
 ---
